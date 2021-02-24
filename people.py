@@ -29,7 +29,7 @@ class People():
     def _init_(self, name, color='Yellow',
                xcoord=50.0, ycoord=0.0, radius=1):
         """
-        Constructor of a Goal object
+        Constructor of a Particle object
         """
         self.name = name
         self.color = color
@@ -39,7 +39,7 @@ class People():
 
     def _str_(self):
         """
-        Print this Goal object
+        Print this Particle object
         """
         return "--> Goal: " \
                + "\n    name: " + str(self.name) \
