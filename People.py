@@ -1,19 +1,8 @@
-import numpy as np
-import scipy as sp
-import sys
-import random
-import matplotlib
-import matplotlib.pyplot as plt
-
-from matplotlib.patches import Circle, Rectangle, Polygon
-import PIL
-from PIL import Image
-from PIL import ImageDraw
 
 
 ###############################
 
-class People():
+class People:
     """
     Defines the particle to represent and interact with (ex: an animal / a human being)
 
@@ -26,8 +15,7 @@ class People():
 
     """
 
-    def _init_(self, name, color='Yellow',
-               xcoord=50.0, ycoord=0.0, radius=1):
+    def __init__(self, name, color,xcoord, ycoord, radius,vx, vy):
         """
         Constructor of a Particle object
         """
@@ -35,17 +23,22 @@ class People():
         self.color = color
         self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
         self.radius = radius
-        Circle((xcoord, ycoord), radius)
+        self.vx=vx
+        self.vy=vy
 
-    def _str_(self):
+    def __str__(self):
         """
         Print this Particle object
         """
         return "--> Goal: " \
-               + "\n    name: " + str(self.name) \
-               + "\n    color: " + str(self.color) \
+               + "\n    name : " + str(self.name) \
+               + "\n    color : " + str(self.color) \
+               + "\n    xcoord : " + str(self.xcoord) \
+               + "\n    ycoord : " + str(self.ycoord) \
+               + "\n    vx: " + str(self.vx) \
+               + "\n    vy: " + str(self.vy) \
  \
-    ############
+            ############
 
     def people_wall_distance(self):
         """
@@ -56,3 +49,5 @@ class People():
         """
         Determines the distance for all the particles between them and their targets
         """
+        xcoord_sortie=200
+        ycoord_sortie=0
