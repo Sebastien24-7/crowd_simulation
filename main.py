@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.messagebox import showinfo
 
 fenetre = Tk()
-fenetre.title("Crow Simulation", )
+fenetre.title("Crow Simulation")
 
 
 ####

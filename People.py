@@ -1,8 +1,19 @@
+import numpy as np
+import scipy as sp
+import sys
+import random
+import matplotlib
+import matplotlib.pyplot as plt
+
+from matplotlib.patches import Circle, Rectangle, Polygon
+import PIL
+from PIL import Image
+from PIL import ImageDraw
 
 
 ###############################
 
-class People:
+class People():
     """
     Defines the particle to represent and interact with (ex: an animal / a human being)
 
@@ -12,31 +23,29 @@ class People:
         name of the people/particle
     color: string
         particles are represented as yellow
+    xcoord: float
+    ycoord: float
+    radius: int
 
     """
 
-    def __init__(self, name, color,xcoord, ycoord, radius,vx, vy):
+    def _init_(self):
         """
         Constructor of a Particle object
         """
-        self.name = name
-        self.color = color
-        self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
-        self.radius = radius
-        self.vx=vx
-        self.vy=vy
+        self.name = "Particle"
+        self.color = "Yellow"
+        self.xcoord, self.ycoord = [50.0, 50.0]  # They are the coordinates of the center of the particle
+        self.radius = 1
+        return (self.xcoord, self.ycoord, self.radius, self.color, self.name)
 
-    def __str__(self):
+    def _str_(self):
         """
         Print this Particle object
         """
         return "--> Goal: " \
-               + "\n    name : " + str(self.name) \
-               + "\n    color : " + str(self.color) \
-               + "\n    xcoord : " + str(self.xcoord) \
-               + "\n    ycoord : " + str(self.ycoord) \
-               + "\n    vx: " + str(self.vx) \
-               + "\n    vy: " + str(self.vy) \
+               + "\n    name: " + str(self.name) \
+               + "\n    color: " + str(self.color) \
  \
             ############
 
@@ -49,5 +58,3 @@ class People:
         """
         Determines the distance for all the particles between them and their targets
         """
-        xcoord_sortie=200
-        ycoord_sortie=0
