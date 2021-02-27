@@ -1,12 +1,7 @@
-import numpy as np
-import scipy as sp
 import sys
 import random
 import matplotlib
-import matplotlib.pyplot as plt
 
-from matplotlib.patches import Circle, Rectangle, Polygon
-import PIL
 from PIL import Image
 from PIL import ImageDraw
 
@@ -29,23 +24,24 @@ class People():
 
     """
 
-    def _init_(self):
+    def __init__(self,xcoord,ycoord):
         """
         Constructor of a Particle object
         """
         self.name = "Particle"
         self.color = "Yellow"
-        self.xcoord, self.ycoord = [50.0, 50.0]  # They are the coordinates of the center of the particle
+        self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
         self.radius = 1
-        return (self.xcoord, self.ycoord, self.radius, self.color, self.name)
 
-    def _str_(self):
+    def __str__(self):
         """
         Print this Particle object
         """
-        return "--> Goal: " \
+        return "--> Je suis un objet People " \
                + "\n    name: " + str(self.name) \
                + "\n    color: " + str(self.color) \
+               + "\n    xcoord: " + str(self.xcoord) \
+               + "\n    ycoord: " + str(self.ycoord) \
  \
             ############
 
