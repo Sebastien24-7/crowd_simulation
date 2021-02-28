@@ -17,33 +17,16 @@ Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
 Bouton_Quitter.pack()
 
 #Quelques tests avec les modifs dans la classe People...
-p=People(10,10)
-print (p)
+
 dx = 5
 dy = 5
 
-
-
-print("my_particles")
-
-
 ###############################
-
-
-
-# On lance la boucle principale:
-Simulation.mainloop()
-
-# Il faudrait réussir à mettre tous les particules dans une liste pour calculer leur déplacement ensemble
 
 def CreaBalle():
     xcoord = (width - 30) * random.random() + 10
     ycoord = (height - 30) * random.random() + 10
     return interface.create_oval(xcoord, ycoord, xcoord + 20, ycoord + 20, fill='red')
-
-# Better to fix a speed for now
-#dx = 10 * random.random()
-#dy = 10 * random.random()
 
 def CreaPeople(People):
     p = People
@@ -63,10 +46,10 @@ def CreaPart():
     # il faut connecter cette partie avec la classe People
 
 # Creation of the Movement
-def deplacement(ListPart):
+def deplacement():
     global dx, dy
-    for i in range(0, 1):
-        b=interface.create_oval(ListPart[i].xcoord, ListPart[i].ycoord, ListPart[i].xcoord + 20, ListPart[i].ycoord + 20, fill=ListPart[i].color)
+    for i in range(0, len(ListPart)):
+        b = CreaPeople(ListPart[i])
         if interface.coords(b)[3] > height - 10:
             dy = -dy
         if interface.coords(b)[3] < 30:
@@ -88,6 +71,9 @@ def deplacement(ListPart):
     # On repete cette fonction
     Simulation.after(30, deplacement)
 
-ListPart=CreaPart()
-print(ListPart)
-CreaPeople(ListPart[0])
+
+ListPart = CreaPart()
+deplacement()
+
+# On lance la boucle principale:
+Simulation.mainloop()
