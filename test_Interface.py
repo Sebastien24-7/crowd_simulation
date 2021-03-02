@@ -1,4 +1,5 @@
 import random
+import time
 from tkinter import *
 from People import *
 
@@ -16,10 +17,15 @@ Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
 # On ajoute l'affichage du bouton dans la fenêtre tk:
 Bouton_Quitter.pack()
 
+# Creation  d'un bouton "Quitter":
+Bouton2_Quitter = Button(Simulation, text='rr', command=interface.delete('all'))
+# On ajoute l'affichage du bouton dans la fenêtre tk:
+Bouton2_Quitter.pack()
+
 #Quelques tests avec les modifs dans la classe People...
 
-dx = 5
-dy = 5
+dx = random.random()*5
+dy = random.random()*5
 
 ###############################
 
@@ -35,10 +41,12 @@ def CreaPeople(People):
 # Creation of the list of people
 def CreaPart():
     my_particles = []
-    for i in range(0, 5):
+    for i in range(0, 10):
         xcoord = (width - 30) * random.random() + 10
         ycoord = (height - 30) * random.random() + 10
-        p = People(xcoord,ycoord)
+        vx = random.random() * 5
+        vy = random.random() * 5
+        p = People(xcoord,ycoord,vx,vy)
         my_particles.append(p)
     return my_particles
 
@@ -47,17 +55,30 @@ def CreaPart():
 
 # Creation of the Movement
 def deplacement():
+    interface.delete('all')
     global dx, dy
-    for i in range(0, len(ListPart)):
-        b = CreaPeople(ListPart[i])
+    for i in range(0,10):
+        p = ListPart[i]
+        b=interface.create_oval(p.xcoord, p.ycoord, p.xcoord + 20, p.ycoord + 20, fill=p.color)
+        interface.pack()
+
+        #b = CreaPeople(ListPart[i])
         if interface.coords(b)[3] > height - 10:
-            dy = -dy
-        if interface.coords(b)[3] < 30:
-            dy = -dy
+            p.vy = -p.vy
+
+        if interface.coords(b)[1] < 0:
+            p.vy = -p.vy
+
         if interface.coords(b)[2] > width - 10:
-            dx = -dx
-        if interface.coords(b)[2] < 30:
-            dx = -dx
+            p.vx = -p.vx
+
+        if interface.coords(b)[0] < 0:
+            p.vx = -p.vx
+
+        p.xcoord = p.xcoord + p.vx
+        p.ycoord = p.ycoord + p.vy
+
+        #interface.move(b, vx, vy)
 
     # A améliorer mais l'idée est là (c'était un poil bugé)
     # Test de la collision avec la raquette :
@@ -66,14 +87,17 @@ def deplacement():
     #     dy = -1 * dy
 
     # On deplace la balle :
-    interface.move(b, dx, dy)
+
 
     # On repete cette fonction
-    Simulation.after(30, deplacement)
+    Simulation.after(200, deplacement)
 
+def suppr():
+    interface.delete('all')
 
 ListPart = CreaPart()
-deplacement()
+for i in range(0,len(ListPart)):
+    deplacement()
 
 # On lance la boucle principale:
 Simulation.mainloop()

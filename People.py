@@ -1,7 +1,7 @@
 import sys
 import random
 import matplotlib
-
+import numpy
 from PIL import Image
 from PIL import ImageDraw
 
@@ -24,13 +24,21 @@ class People():
 
     """
 
-    def __init__(self,xcoord,ycoord):
+    def __init__(self,xcoord,ycoord,vx,vy):
         """
         Constructor of a Particle object
         """
         self.name = "Particle"
-        self.color = "Yellow"
+        colors = ["red", "orange", "yellow", "green", "blue", "violet"]
+        #self.color = random.choice(colors)
+        self.color ="#{:06x}".format(random.randint(0, 0xffffff))
         self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
+
+        coord_sortie = [0, -20]
+        D = [self.xcoord - coord_sortie[0], self.ycoord - coord_sortie[1]]
+        D_norm = D / numpy.linalg.norm(D)
+
+        self.vx,self.vy = (vx,vy)
         self.radius = 1
 
     def __str__(self):
@@ -54,3 +62,7 @@ class People():
         """
         Determines the distance for all the particles between them and their targets
         """
+        coord_sortie=[0,-20]
+        D=[self.xcoord-coord_sortie[0],self.ycoord-coord_sortie[1]]
+        D_norm=D/numpy.linalg.norm(D)
+        return D_norm
