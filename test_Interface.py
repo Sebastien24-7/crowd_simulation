@@ -36,7 +36,6 @@ def CreaPeople(People):
     p = People
     return interface.create_oval(p.xcoord, p.ycoord, p.xcoord + 20, p.ycoord + 20, fill=p.color)
 
-
 # Creation of the list of people
 def CreaPart():
     my_particles = []
@@ -48,10 +47,6 @@ def CreaPart():
         p = People(xcoord, ycoord, vx, vy)
         my_particles.append(p)
     return my_particles
-
-    # On cree une balle:
-    # il faut connecter cette partie avec la classe People
-
 
 # Creation of the Movement
 def deplacement():
