@@ -93,8 +93,24 @@ def deplacement():
                 p[j].vx = temp_vx * 0.9
                 p[j].vy = temp_vy * 0.9
 
-                p[i].color = "Yellow"
-                p[j].color = "Orange"
+                p[i].touched += 1
+                p[j].touched += 1
+
+                # Start of relfexion about visualizing the gradient of contact (to modify)
+                if p[i].touched == 1:
+                    p[i].color = "Yellow"
+                if p[j].touched == 1:
+                    p[j].color = "Yellow"
+
+                if p[i].touched > 1:
+                    p[i].color = "Orange"
+                if p[j].touched > 1:
+                    p[j].color = "Orange"
+
+                if p[i].touched >= 5:
+                    p[i].color = "Red"
+                if p[j].touched >= 5:
+                    p[j].color = "Red"
 
     # To reduce the speed of simulation
     Simulation.after(200, deplacement)

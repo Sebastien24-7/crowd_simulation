@@ -5,13 +5,11 @@ import numpy
 from PIL import Image
 from PIL import ImageDraw
 
-
 ###############################
 
 class People():
     """
     Defines the particle to represent and interact with (ex: an animal / a human being)
-
     ------
     Attributes :
     name: string
@@ -23,7 +21,6 @@ class People():
     radius: int
 
     """
-
     def __init__(self,xcoord,ycoord,vx,vy):
         """
         Constructor of a Particle object
@@ -33,6 +30,7 @@ class People():
         #self.color = random.choice(colors)
         self.color ="#{:06x}".format(random.randint(0, 0xffffff))
         self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
+        self.touched = 0
 
         coord_sortie = [0, -20]
         D = [self.xcoord - coord_sortie[0], self.ycoord - coord_sortie[1]]
@@ -50,6 +48,7 @@ class People():
                + "\n    color: " + str(self.color) \
                + "\n    xcoord: " + str(self.xcoord) \
                + "\n    ycoord: " + str(self.ycoord) \
+               + "\n    touched: " + str(self.touched) \
  \
             ############
     def people_wall_distance(self):
