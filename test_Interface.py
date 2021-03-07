@@ -11,7 +11,6 @@ width = 500
 height = 500
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white")
 interface.pack(padx=100, pady=100)
-interface.create_rectangle(10, 10, width - 10, height - 10)
 
 # Creation  d'un bouton "Quitter":
 Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
@@ -27,8 +26,8 @@ Bouton2_Quitter.pack()
 ###############################
 
 def CreaBalle():
-    xcoord = (width - 30) * random.random() + 10
-    ycoord = (height - 30) * random.random() + 10
+    xcoord = (width - 40) * random.random() + 10
+    ycoord = (height - 40) * random.random() + 10
     return interface.create_oval(xcoord, ycoord, xcoord + 20, ycoord + 20, fill='red')
 
 
@@ -40,35 +39,48 @@ def CreaPeople(People):
 def CreaPart():
     my_particles = []
     for i in range(0, 10):
-        xcoord = (width - 30) * random.random() + 10
-        ycoord = (height - 30) * random.random() + 10
+        xcoord = (width - 40) * random.random() + 10
+        ycoord = (height - 40) * random.random() + 10
         vx = random.random() * 5
         vy = random.random() * 5
         p = People(xcoord, ycoord, vx, vy)
         my_particles.append(p)
     return my_particles
 
+
+# Create the environment
+def CreateEnv():
+    # Create the room
+    interface.create_rectangle(20, 20, width - 20, height - 20, outline="red", width=5)
+    interface.pack()
+    # Create the door
+    interface.create_line(20, (height / 2 - 15), 20, (height / 2 + 15), fill="green", width=5)
+    interface.pack()
+
+
 # Creation of the Movement
 def deplacement():
     interface.delete('all')
     global dx, dy
     p = ListPart
+    CreateEnv()
+
     for i in range(0, 10):
 
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
 
         # b = CreaPeople(ListPart[i])
-        if interface.coords(b)[3] > height - 10:
+        if interface.coords(b)[3] > height - 30:
             p[i].vy = -p[i].vy
 
-        if interface.coords(b)[1] < 0:
+        if interface.coords(b)[1] < 20:
             p[i].vy = -p[i].vy
 
-        if interface.coords(b)[2] > width - 10:
+        if interface.coords(b)[2] > width - 30:
             p[i].vx = -p[i].vx
 
-        if interface.coords(b)[0] < 0:
+        if interface.coords(b)[0] < 20:
             p[i].vx = -p[i].vx
 
         p[i].xcoord = p[i].xcoord + p[i].vx
