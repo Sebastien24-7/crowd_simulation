@@ -52,7 +52,6 @@ class People():
                + "\n    ycoord: " + str(self.ycoord) \
  \
             ############
-
     def people_wall_distance(self):
         """
         Determines the distance between of all the particles and their nearest walls
