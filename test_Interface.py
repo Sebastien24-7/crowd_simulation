@@ -22,7 +22,7 @@ Bouton2_Quitter = Button(Simulation, text='rr', command=interface.delete('all'))
 # On ajoute l'affichage du bouton dans la fenêtre tk:
 Bouton2_Quitter.pack()
 
-
+w_porte = 30
 ###############################
 
 def CreaBalle():
@@ -54,7 +54,7 @@ def CreateEnv():
     interface.create_rectangle(20, 20, width - 20, height - 20, outline="red", width=5)
     interface.pack()
     # Create the door
-    interface.create_line(20, (height / 2 - 15), 20, (height / 2 + 15), fill="green", width=5)
+    interface.create_line(20, (height / 2 - w_porte), 20, (height / 2 + w_porte), fill="green", width=5)
     interface.pack()
 
 
@@ -63,9 +63,10 @@ def deplacement():
     interface.delete('all')
     global dx, dy
     p = ListPart
+    getting_out = 0
     CreateEnv()
 
-    for i in range(0, 10):
+    for i in range(0, len(p)):
 
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
@@ -81,7 +82,13 @@ def deplacement():
             p[i].vx = -p[i].vx
 
         if interface.coords(b)[0] < 20:
-            p[i].vx = -p[i].vx
+
+            if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte):
+                p[i].vx, p[i].vy = [0, 0]
+                interface.delete(b)
+                # p.pop(i)
+            else:
+                p[i].vx = -p[i].vx
 
         p[i].xcoord = p[i].xcoord + p[i].vx
         p[i].ycoord = p[i].ycoord + p[i].vy
@@ -91,9 +98,8 @@ def deplacement():
             # the ** is the operator for square
             distance = math.sqrt(
                 ((p[j].xcoord + 10) - (p[i].xcoord + 10)) ** 2 + ((p[j].ycoord + 10) - (p[i].ycoord + 10)) ** 2)
-            print(distance)
             # Check for collision
-            if distance < 10:
+            if distance < 13:
                 # We keep in memory the first speed
                 temp_vx = p[i].vx
                 temp_vy = p[i].vy
@@ -125,14 +131,16 @@ def deplacement():
                     p[j].color = "Red"
 
     # To reduce the speed of simulation
-    Simulation.after(200, deplacement)
+    Simulation.after(10, deplacement)
+
 
 def suppr():
     interface.delete('all')
 
+
 ListPart = CreaPart()
-for i in range(0, len(ListPart)):
-    deplacement()
+# for i in range(0, len(ListPart)):
+deplacement()
 
 # On lance la boucle principale:
 Simulation.mainloop()
