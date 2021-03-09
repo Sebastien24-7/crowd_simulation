@@ -34,6 +34,7 @@ class People():
         self.masse = 1
         self.vx,self.vy = (vx,vy)
         self.radius = 1
+        self.out = False
 
     def __str__(self):
         """
