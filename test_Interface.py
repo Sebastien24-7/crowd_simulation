@@ -110,6 +110,8 @@ def deplacement():
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
 
+        # Check for bouncing on the walls or going through the door
+
         # Speed reduced to 0 outside of the room
         if (0 < p[i].xcoord < 20) & ((height / 2 - w_porte) < p[i].ycoord < (height / 2 + w_porte)):
             p[i].vx, p[i].vy = [0, 0]
