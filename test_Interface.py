@@ -17,11 +17,6 @@ Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
 # On ajoute l'affichage du bouton dans la fenêtre tk:
 Bouton_Quitter.pack()
 
-# Creation  d'un bouton "Quitter":
-Bouton2_Quitter = Button(Simulation, text='rr', command=interface.delete('all'))
-# On ajoute l'affichage du bouton dans la fenêtre tk:
-Bouton2_Quitter.pack()
-
 w_porte = 30
 ###############################
 
@@ -41,8 +36,17 @@ def CreaPart():
     for i in range(0, 10):
         xcoord = (width - 40) * random.random() + 10
         ycoord = (height - 40) * random.random() + 10
-        vx = random.random() * 5
-        vy = random.random() * 5
+        coord_sortie = [0, height/2]
+        D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
+
+        # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+        vx = 10*(coord_sortie[0]-xcoord) / math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+        vy = 10*(coord_sortie[1]-ycoord) / math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+        print(D)
+        # vx=10
+        # vy=0
+        # vx = random.random() * 20
+        # vy = random.random() * 20
         p = People(xcoord, ycoord, vx, vy)
         my_particles.append(p)
     return my_particles
@@ -55,21 +59,32 @@ def CreateEnv():
     interface.pack()
     # Create the door
     interface.create_line(20, (height / 2 - w_porte), 20, (height / 2 + w_porte), fill="green", width=5)
+    interface.create_rectangle(0, (height / 2 - w_porte), 20, (height / 2 + w_porte), fill="green", width=5)
     interface.pack()
 
 
 # Creation of the Movement
 def deplacement():
     interface.delete('all')
+
     global dx, dy
     p = ListPart
     getting_out = 0
     CreateEnv()
+    nombre=0
+    n = StringVar(nombre)
+    texteLabel = Label(Simulation, text=StringVar(nombre))
+    texteLabel.pack()
 
     for i in range(0, len(p)):
 
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
+
+        if (0<p[i].xcoord<20) & ((height / 2 - w_porte)<p[i].ycoord<(height / 2 + w_porte)):
+            p[i].vx, p[i].vy = [0, 0]
+            nombre = nombre+1
+            print(nombre)
 
         # b = CreaPeople(ListPart[i])
         if interface.coords(b)[3] > height - 30:
@@ -84,8 +99,8 @@ def deplacement():
         if interface.coords(b)[0] < 20:
 
             if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte):
-                p[i].vx, p[i].vy = [0, 0]
-                interface.delete(b)
+                p[i].vx, p[i].vy = [-1, 0]
+                # interface.delete(b)
                 # p.pop(i)
             else:
                 p[i].vx = -p[i].vx
@@ -99,17 +114,29 @@ def deplacement():
             distance = math.sqrt(
                 ((p[j].xcoord + 10) - (p[i].xcoord + 10)) ** 2 + ((p[j].ycoord + 10) - (p[i].ycoord + 10)) ** 2)
             # Check for collision
-            if distance < 13:
+            if distance < 20:
                 # We keep in memory the first speed
-                temp_vx = p[i].vx
-                temp_vy = p[i].vy
-
+                vx1 = p[i].vx
+                vy1 = p[i].vy
+                vx2 = p[j].vx
+                vy2 = p[j].vy
+                nx=p[i].xcoord-p[j].xcoord
+                ny=p[i].ycoord-p[j].ycoord
+                nx1=((vx1*nx+vy1*ny)/(nx*nx+ny*ny))*nx
+                ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
+                ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                tx1 = vx1 - nx1
+                ty1 = vy1 - ny1
+                tx2 = vx2 - nx2
+                ty2 = vy2 - ny2
                 # Change the speed between particles
-                p[i].vx = p[j].vx * 0.9
-                p[i].vy = p[j].vy * 0.9
 
-                p[j].vx = temp_vx * 0.9
-                p[j].vy = temp_vy * 0.9
+                p[j].vx = tx1+nx2
+                p[j].vy = ty1+ny2
+
+                p[i].vx = tx2 + nx1
+                p[i].vy = ty2 + ny1
 
                 p[i].touched += 1
                 p[j].touched += 1
@@ -131,7 +158,7 @@ def deplacement():
                     p[j].color = "Red"
 
     # To reduce the speed of simulation
-    Simulation.after(10, deplacement)
+    Simulation.after(100, deplacement)
 
 
 def suppr():

@@ -31,11 +31,7 @@ class People():
         self.color ="#{:06x}".format(random.randint(0, 0xffffff))
         self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
         self.touched = 0
-
-        coord_sortie = [0, -20]
-        D = [self.xcoord - coord_sortie[0], self.ycoord - coord_sortie[1]]
-        D_norm = D / numpy.linalg.norm(D)
-
+        self.masse = 1
         self.vx,self.vy = (vx,vy)
         self.radius = 1
 
