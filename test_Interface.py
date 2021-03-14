@@ -24,44 +24,48 @@ w_porte = 30
 
 #####TRASH##############
 # Not Useful anymore
-# def CreaBalle():
-#     xcoord = (width - 40) * random.random() + 10
-#     ycoord = (height - 40) * random.random() + 10
-#     return interface.create_oval(xcoord, ycoord, xcoord + 20, ycoord + 20, fill='red')
-#
-# def CreaPeople(People):
-#     p = People
-#     return interface.create_oval(p.xcoord, p.ycoord, p.xcoord + 20, p.ycoord + 20, fill=p.color)
-
 
 # Creation of the list of people
 def CreaPart():
     my_particles = []
-    for i in range(0, 20):
-        xcoord = (width - 40) * random.random()
-        ycoord = (height - 40) * random.random()
+    for i in range(0, 100):
+        xcoord = (width - 40) * random.random() + 30
+        ycoord = (height - 40) * random.random() + 30
 
+        coord_sortie = [0, height / 2]
+        D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
+        # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+        # print(D)
+
+        vx = 10 * (coord_sortie[0] - xcoord) / math.sqrt(
+            (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+        vy = 10 * (coord_sortie[1] - ycoord) / math.sqrt(
+            (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+
+        # vx = random.random() * 10
+        # vy = random.random() * 10
+
+        p = People(xcoord, ycoord, vx, vy)
+        my_particles.append(p)
+    return my_particles
+
+
+##Deal with the overlapping at the creation of the particles
+def CreaCrowd(my_particles):
+    for i in range(0, len(my_particles)):
         # Check it is inside the room (but not functional)
-        if 20 > xcoord or xcoord > width - 50:
-            xcoord = (width - 60) * random.random()
-        if 20 > ycoord or ycoord > height - 50:
-            ycoord = (height - 60) * random.random()
+        if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
+            my_particles[i].xcoord = (width - 80) * random.random() + 30
+        if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
+            my_particles[i].ycoord = (height - 80) * random.random() + 30
 
-        else:
-            coord_sortie = [0, height / 2]
-            D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
-
-            # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-            vx = 10 * (coord_sortie[0] - xcoord) / math.sqrt(
-                (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-            vy = 10 * (coord_sortie[1] - ycoord) / math.sqrt(
-                (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-            # print(D)
-            # vx = random.random() * 10
-            # vy = random.random() * 10
-
-            p = People(xcoord, ycoord, vx, vy)
-            my_particles.append(p)
+        # Checking the overlapping between particles
+        for j in range(0, len(my_particles)):
+            distance = math.sqrt(((my_particles[i].xcoord + 10) - (my_particles[i].xcoord + 10)) ** 2 + (
+                        (my_particles[j].ycoord + 10) - (my_particles[j].ycoord + 10)) ** 2)
+            if distance < 20:
+                my_particles[i].xcoord = (width - 80) * random.random() + 30
+                my_particles[i].ycoord = (height - 80) * random.random() + 30
 
     return my_particles
 
@@ -73,13 +77,13 @@ def ComputeTraject(my_particles):
     for i in range(0, len(my_particles)):
         # Compute the distance
         D = [my_particles[i].xcoord - coord_sortie[0], my_particles[i].ycoord - coord_sortie[1]]
+        # print(D)
 
         # Give the adapted speed to each particle
         my_particles[i].vx = 10 * (coord_sortie[0] - my_particles[i].xcoord) / math.sqrt(
             (my_particles[i].xcoord - coord_sortie[0]) ** 2 + (my_particles[i].ycoord - coord_sortie[1]) ** 2)
         my_particles[i].vy = 10 * (coord_sortie[1] - my_particles[i].ycoord) / math.sqrt(
             (my_particles[i].xcoord - coord_sortie[0]) ** 2 + (my_particles[i].ycoord - coord_sortie[1]) ** 2)
-        # print(D)
 
 
 # Create the environment
@@ -122,13 +126,13 @@ def deplacement():
         if interface.coords(b)[3] > height - 30:
             p[i].vy = -p[i].vy
 
-        if interface.coords(b)[1] < 20:
+        if interface.coords(b)[1] < 25:
             p[i].vy = -p[i].vy
 
         if interface.coords(b)[2] > width - 30:
             p[i].vx = -p[i].vx
 
-        if interface.coords(b)[0] < 20:
+        if interface.coords(b)[0] < 25:
 
             if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte):
                 p[i].vx, p[i].vy = [-1, 0]
@@ -163,19 +167,26 @@ def deplacement():
                 ty1 = vy1 - ny1
                 tx2 = vx2 - nx2
                 ty2 = vy2 - ny2
-                # Change the speed between particles
 
+                # Change the speed between particles
                 p[j].vx = tx1 + nx2
                 p[j].vy = ty1 + ny2
 
                 p[i].vx = tx2 + nx1
                 p[i].vy = ty2 + ny1
 
+                ##Trying to create the collision angle to reset properly the direction
+                converter = math.pi / 180  # to convert degrees in radians
+                if nx == 0:
+                    p[j].angle = math.pi / 2
+                else:
+                    p[j].angle = math.atan(ny / nx)
+
                 # Replace them so as to avoid overlapping
-                p[j].xcoord += 7
-                p[j].ycoord += 7
-                p[i].xcoord -= 7
-                p[i].ycoord -= 7
+                # p[j].xcoord += 7
+                # p[j].ycoord += 7
+                # p[i].xcoord -= 7
+                # p[i].ycoord -= 7
 
                 p[i].touched += 1
                 p[j].touched += 1
@@ -197,7 +208,7 @@ def deplacement():
                     p[j].color = "Red"
 
     # To reduce the speed of simulation
-    Simulation.after(100, deplacement)
+    Simulation.after(200, deplacement)
 
     particles_out = len(part_out)
     print(particles_out)
@@ -212,7 +223,8 @@ def suppr():
     interface.delete('all')
 
 
-ListPart = CreaPart()
+particles = CreaPart()
+ListPart = CreaCrowd(particles)
 deplacement()
 
 # On lance la boucle principale:

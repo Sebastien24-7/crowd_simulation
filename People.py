@@ -32,7 +32,8 @@ class People():
         self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
         self.touched = 0
         self.masse = 1
-        self.vx,self.vy = (vx,vy)
+        self.angle = 0
+        self.vx, self.vy = (vx, vy)
         self.radius = 1
         self.out = False
 
