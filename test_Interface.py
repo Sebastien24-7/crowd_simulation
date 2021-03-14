@@ -61,9 +61,7 @@ def CreaCrowd(my_particles):
 
         # Checking the overlapping between particles
         for j in range(0, len(my_particles)):
-            distance = math.sqrt(((my_particles[i].xcoord + 10) - (my_particles[i].xcoord + 10)) ** 2 + (
-                        (my_particles[j].ycoord + 10) - (my_particles[j].ycoord + 10)) ** 2)
-            if distance < 20:
+            if my_particles[i].distance_collision(my_particles[j]) < 25:
                 my_particles[i].xcoord = (width - 80) * random.random() + 30
                 my_particles[i].ycoord = (height - 80) * random.random() + 30
 
@@ -146,11 +144,8 @@ def deplacement():
 
         ### Check for collisions between the balls ####
         for j in range(i + 1, len(ListPart)):
-            # the ** is the operator for square
-            distance = math.sqrt(
-                ((p[j].xcoord + 10) - (p[i].xcoord + 10)) ** 2 + ((p[j].ycoord + 10) - (p[i].ycoord + 10)) ** 2)
             # Check for collision
-            if distance < 20:
+            if p[i].distance_collision(p[j]) < 20:
                 # We keep in memory the first speed
                 vx1 = p[i].vx
                 vy1 = p[i].vy
@@ -217,7 +212,6 @@ def deplacement():
     if len(part_out) == len(p):
         print("Everyone is out of the room")
         exit()
-
 
 def suppr():
     interface.delete('all')

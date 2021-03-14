@@ -1,3 +1,4 @@
+import math
 import sys
 import random
 import matplotlib
@@ -49,10 +50,15 @@ class People():
                + "\n    touched: " + str(self.touched) \
  \
             ############
-    def people_wall_distance(self):
+
+    def distance_collision(self, particle):
         """
-        Determines the distance between of all the particles and their nearest walls
+        Determines the distance between of all the particles
         """
+        # the ** is the operator for square
+        distance = math.sqrt(((particle.xcoord + 10) - (self.xcoord + 10)) ** 2 +
+                             ((particle.ycoord + 10) - (self.ycoord + 10)) ** 2)
+        return distance
 
     def people_target_distance(self):
         """
