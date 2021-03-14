@@ -18,7 +18,7 @@ Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
 # On ajoute l'affichage du bouton dans la fenêtre tk:
 Bouton_Quitter.pack()
 
-## VARIABLES
+### VARIABLES
 w_porte = 30
 
 
@@ -37,26 +37,28 @@ w_porte = 30
 # Creation of the list of people
 def CreaPart():
     my_particles = []
-    for i in range(0, 50):
-        xcoord = (width - 40) * random.random() + 20
-        ycoord = (height - 40) * random.random() + 20
+    for i in range(0, 20):
+        xcoord = (width - 40) * random.random()
+        ycoord = (height - 40) * random.random()
 
         # Check it is inside the room (but not functional)
-        if 20 > xcoord or xcoord > width - 20:
-            xcoord = (width - 50) * random.random() + 20
-        if 20 > ycoord or ycoord > height - 20:
-            ycoord = (height - 50) * random.random() + 20
+        if 20 > xcoord or xcoord > width - 50:
+            xcoord = (width - 60) * random.random()
+        if 20 > ycoord or ycoord > height - 50:
+            ycoord = (height - 60) * random.random()
 
         else:
-            # coord_sortie = [0, height/2]
-            # D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
-            #
-            # # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-            # vx = 10*(coord_sortie[0]-xcoord) / math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-            # vy = 10*(coord_sortie[1]-ycoord) / math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+            coord_sortie = [0, height / 2]
+            D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
+
+            # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+            vx = 10 * (coord_sortie[0] - xcoord) / math.sqrt(
+                (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+            vy = 10 * (coord_sortie[1] - ycoord) / math.sqrt(
+                (xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
             # print(D)
-            vx = random.random() * 10
-            vy = random.random() * 10
+            # vx = random.random() * 10
+            # vy = random.random() * 10
 
             p = People(xcoord, ycoord, vx, vy)
             my_particles.append(p)
@@ -138,7 +140,7 @@ def deplacement():
         p[i].xcoord = p[i].xcoord + p[i].vx
         p[i].ycoord = p[i].ycoord + p[i].vy
 
-        # Check for collisions between the balls
+        ### Check for collisions between the balls ####
         for j in range(i + 1, len(ListPart)):
             # the ** is the operator for square
             distance = math.sqrt(
@@ -169,6 +171,12 @@ def deplacement():
                 p[i].vx = tx2 + nx1
                 p[i].vy = ty2 + ny1
 
+                # Replace them so as to avoid overlapping
+                p[j].xcoord += 7
+                p[j].ycoord += 7
+                p[i].xcoord -= 7
+                p[i].ycoord -= 7
+
                 p[i].touched += 1
                 p[j].touched += 1
 
@@ -196,6 +204,7 @@ def deplacement():
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
+        print("Everyone is out of the room")
         exit()
 
 
