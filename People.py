@@ -68,3 +68,15 @@ class People():
         D=[self.xcoord-coord_sortie[0],self.ycoord-coord_sortie[1]]
         D_norm=D/numpy.linalg.norm(D)
         return D_norm
+
+    def ComputeTraj(self,coord_sortie):
+
+        self.vx= (coord_sortie[0] - self.xcoord) / math.sqrt(
+            (self.xcoord - coord_sortie[0]) ** 2 + (self.ycoord - coord_sortie[1]) ** 2)
+        self.vy= (coord_sortie[1] - self.ycoord) / math.sqrt(
+            (self.xcoord - coord_sortie[0]) ** 2 + (self.ycoord - coord_sortie[1]) ** 2)
+
+    def DistanceSortie(self,coord_sortie):
+        delta_x=coord_sortie[0] - self.xcoord
+        delta_y=coord_sortie[1] - self.ycoord
+        return math.sqrt(delta_x ** 2 + delta_y ** 2)

@@ -100,7 +100,8 @@ def deplacement():
     interface.delete('all')
 
     p = ListPart
-    ComputeTraject(p)
+
+    # ComputeTraject(p)
     part_out = []
     CreateEnv()
 
@@ -114,10 +115,12 @@ def deplacement():
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
 
+        p[i].ComputeTraj([0, height / 2])
+
         # Check for bouncing on the walls or going through the door
 
         # Speed reduced to 0 outside of the room
-        if (0 < p[i].xcoord < 20) & ((height / 2 - w_porte) < p[i].ycoord < (height / 2 + w_porte)):
+        if (0 < p[i].xcoord < 15) & ((height / 2 - w_porte) < p[i].ycoord < (height / 2 + w_porte)):
             p[i].vx, p[i].vy = [0, 0]
             # nombre = nombre+1
             # print(nombre)
@@ -130,10 +133,11 @@ def deplacement():
         if interface.coords(b)[2] > width - 30:
             p[i].vx = -p[i].vx
 
-        if interface.coords(b)[0] < 25:
+        if interface.coords(b)[0] < 20:
 
-            if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte):
+            if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
+                p[i].color="green"
                 if p[i] not in part_out:
                     part_out.append(p[i])
             else:
@@ -143,67 +147,77 @@ def deplacement():
         p[i].ycoord = p[i].ycoord + p[i].vy
 
         ### Check for collisions between the balls ####
-        for j in range(i + 1, len(ListPart)):
-            # Check for collision
-            if p[i].distance_collision(p[j]) < 20:
-                # We keep in memory the first speed
-                vx1 = p[i].vx
-                vy1 = p[i].vy
-                vx2 = p[j].vx
-                vy2 = p[j].vy
-
-                nx = p[i].xcoord - p[j].xcoord
-                ny = p[i].ycoord - p[j].ycoord
-                nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
-                ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
-                ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                tx1 = vx1 - nx1
-                ty1 = vy1 - ny1
-                tx2 = vx2 - nx2
-                ty2 = vy2 - ny2
-
-                # Change the speed between particles
-                p[j].vx = tx1 + nx2
-                p[j].vy = ty1 + ny2
-
-                p[i].vx = tx2 + nx1
-                p[i].vy = ty2 + ny1
+        # for j in range(i + 1, len(ListPart)):
+        #     # Check for collision
+        #     if p[i].distance_collision(p[j]) < 20:
+        #         # We keep in memory the first speed
+        #         vx1 = p[i].vx
+        #         vy1 = p[i].vy
+        #         vx2 = p[j].vx
+        #         vy2 = p[j].vy
+        #
+        #         nx = p[i].xcoord - p[j].xcoord
+        #         ny = p[i].ycoord - p[j].ycoord
+        #         nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
+        #         ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+        #         nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
+        #         ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+        #         tx1 = vx1 - nx1
+        #         ty1 = vy1 - ny1
+        #         tx2 = vx2 - nx2
+        #         ty2 = vy2 - ny2
+        #
+        #         # Change the speed between particles
+        #         p[j].vx = tx1 + nx2
+        #         p[j].vy = ty1 + ny2
+        #
+        #         p[i].vx = tx2 + nx1
+        #         p[i].vy = ty2 + ny1
+        #
+        #         p[i].touched += 1
+        #         p[j].touched += 1
+        #
+        #         # Start of relfexion about visualizing the gradient of contact (to modify)
+        #         if p[i].touched == 1:
+        #             p[i].color = "Yellow"
+        #         if p[j].touched == 1:
+        #             p[j].color = "Yellow"
+        #
+        #         if p[i].touched > 1:
+        #             p[i].color = "Orange"
+        #         if p[j].touched > 1:
+        #             p[j].color = "Orange"
+        #
+        #         if p[i].touched >= 5:
+        #             p[i].color = "Red"
+        #         if p[j].touched >= 5:
+        #             p[j].color = "Red"
+        #
+        #     else:
+        #         if (p[i].xcoord - p[j].xcoord) > 20:
+        #             p[j].ComputeTraj([0, height / 2])
 
                 ##Trying to create the collision angle to reset properly the direction
-                converter = math.pi / 180  # to convert degrees in radians
-                if nx == 0:
-                    p[j].angle = math.pi / 2
-                else:
-                    p[j].angle = math.atan(ny / nx)
+                # converter = math.pi / 180  # to convert degrees in radians
+                # if nx == 0:
+                #     p[j].angle = math.pi / 2
+                # else:
+                #     p[j].angle = math.atan(ny / nx)
 
                 # Replace them so as to avoid overlapping
-                # p[j].xcoord += 7
-                # p[j].ycoord += 7
-                # p[i].xcoord -= 7
-                # p[i].ycoord -= 7
+                # p[j].xcoord += random.random()*7
+                # p[j].ycoord += random.random()*7
+                # p[i].xcoord -= random.random()*7
+                # p[i].ycoord -= random.random()*7
 
-                p[i].touched += 1
-                p[j].touched += 1
-
-                # Start of relfexion about visualizing the gradient of contact (to modify)
-                if p[i].touched == 1:
-                    p[i].color = "Yellow"
-                if p[j].touched == 1:
-                    p[j].color = "Yellow"
-
-                if p[i].touched > 1:
-                    p[i].color = "Orange"
-                if p[j].touched > 1:
-                    p[j].color = "Orange"
-
-                if p[i].touched >= 5:
-                    p[i].color = "Red"
-                if p[j].touched >= 5:
-                    p[j].color = "Red"
+                # if (interface.find_overlapping(p[i].xcoord, p[i].ycoord, p[j].xcoord, p[j].ycoord) == 0):
+                #     p[j].ComputeTraj([0, height / 2])
+                # else:
+                #     p[j].xcoord += random.random() * 5
+                #     p[j].ycoord += random.random() * 5
 
     # To reduce the speed of simulation
-    Simulation.after(200, deplacement)
+    Simulation.after(20, deplacement)
 
     particles_out = len(part_out)
     print(particles_out)
@@ -212,6 +226,7 @@ def deplacement():
     if len(part_out) == len(p):
         print("Everyone is out of the room")
         exit()
+
 
 def suppr():
     interface.delete('all')
