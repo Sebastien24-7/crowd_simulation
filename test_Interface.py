@@ -13,10 +13,17 @@ height = 500
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white")
 interface.pack(padx=100, pady=100)
 
+# # Creation  d'un bouton "Jouer":
+# Bouton_Jouer = Button(Simulation, text='Jouer', command=Simulation.destroy)
+# # On ajoute l'affichage du bouton dans la fenêtre tk:
+# Bouton_Jouer.pack()
+
 # Creation  d'un bouton "Quitter":
 Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
 # On ajoute l'affichage du bouton dans la fenêtre tk:
 Bouton_Quitter.pack()
+
+
 
 ### VARIABLES
 w_porte = 30
@@ -26,9 +33,9 @@ w_porte = 30
 # Not Useful anymore
 
 # Creation of the list of people
-def CreaPart():
+def CreaPart(number):
     my_particles = []
-    for i in range(0, 100):
+    for i in range(0, number):
         xcoord = (width - 40) * random.random() + 30
         ycoord = (height - 40) * random.random() + 30
 
@@ -52,20 +59,42 @@ def CreaPart():
 
 ##Deal with the overlapping at the creation of the particles
 def CreaCrowd(my_particles):
-    for i in range(0, len(my_particles)):
-        # Check it is inside the room (but not functional)
-        if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
-            my_particles[i].xcoord = (width - 80) * random.random() + 30
-        if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
-            my_particles[i].ycoord = (height - 80) * random.random() + 30
+    # for i in range(0, len(my_particles)):
+    #     # Check it is inside the room (but not functional)
+    #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
+    #         my_particles[i].xcoord = (width - 80) * random.random() + 30
+    #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
+    #         my_particles[i].ycoord = (height - 80) * random.random() + 30
+    #
+    #     # Checking the overlapping between particles
+    #     for j in range(0, len(my_particles)):
+    #         if my_particles[i].distance_collision(my_particles[j]) < 25:
+    #             my_particles[i].xcoord = (width - 80) * random.random() + 30
+    #             my_particles[i].ycoord = (height - 80) * random.random() + 30
+    #
+    # return my_particles
 
-        # Checking the overlapping between particles
-        for j in range(0, len(my_particles)):
-            if my_particles[i].distance_collision(my_particles[j]) < 25:
-                my_particles[i].xcoord = (width - 80) * random.random() + 30
-                my_particles[i].ycoord = (height - 80) * random.random() + 30
+    # Initialisation des particules sur forme de grille
+        i=5
+        j=4
+        for k in range(0, len(my_particles)):
+            my_particles[k].vx = 0
+            my_particles[k].vy = 0
+            # my_particles[k].xcoord = 40
+            # my_particles[k].ycoord = 40
+            if 40*i<=420:
+                i=i+1
+                my_particles[k].xcoord = 40 * i
+                my_particles[k].ycoord = 40 * j
+            else :
+                i=1
+                j=j+1
+                my_particles[k].xcoord = 40
+                my_particles[k].ycoord = 40 * j
 
-    return my_particles
+        return my_particles
+
+
 
 
 # Compute and give the adapted speed for the particles to reach the door
@@ -145,6 +174,27 @@ def deplacement():
 
         p[i].xcoord = p[i].xcoord + p[i].vx
         p[i].ycoord = p[i].ycoord + p[i].vy
+
+        ## Check for collisions between the balls ####
+        for j in range(0, len(ListPart)):
+            # Check for collision
+            if p[i].distance_collision(p[j]) <= 20:
+                if p[i].DistanceSortie([0, height / 2])<p[j].DistanceSortie([0, height / 2]):
+                    while True:
+                        p[i].xcoord = p[i].xcoord + p[i].vx
+                        p[i].ycoord = p[i].ycoord + p[i].vy
+                        p[j].xcoord = p[j].xcoord
+                        p[j].ycoord = p[j].ycoord
+                        p[i].color = "Red"
+                        if p[i].distance_collision(p[j]) > 20:
+                            break
+                else:
+                    p[j].xcoord = p[j].xcoord + p[j].vx
+                    p[j].ycoord = p[j].ycoord + p[j].vy
+                    p[i].xcoord = p[i].xcoord
+                    p[i].ycoord = p[i].ycoord
+                    p[j].color = "Blue"
+
 
         ### Check for collisions between the balls ####
         # for j in range(i + 1, len(ListPart)):
@@ -232,7 +282,8 @@ def suppr():
     interface.delete('all')
 
 
-particles = CreaPart()
+particles = CreaPart(50)
+# ListPart = particles
 ListPart = CreaCrowd(particles)
 deplacement()
 
