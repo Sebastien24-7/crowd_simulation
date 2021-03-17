@@ -11,22 +11,41 @@ Simulation.title("Crowd Simulation")
 width = 500
 height = 500
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white")
-interface.pack(padx=100, pady=100)
+interface.pack(padx=50, pady=50)
 
-# # Creation  d'un bouton "Jouer":
-# Bouton_Jouer = Button(Simulation, text='Jouer', command=Simulation.destroy)
-# # On ajoute l'affichage du bouton dans la fenêtre tk:
-# Bouton_Jouer.pack()
+##### Trying to set up the screen of simulation
+Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
+Frame2.pack(side=TOP, padx=10, pady=10)
 
-# Creation  d'un bouton "Quitter":
-Bouton_Quitter = Button(Simulation, text='Quitter', command=Simulation.destroy)
-# On ajoute l'affichage du bouton dans la fenêtre tk:
-Bouton_Quitter.pack()
+s = Spinbox(Frame2, from_=10, to_=100, width=10)
+s.pack()
+
+##Variables attached to Simulation
+example = StringVar(interface, name="example")
+example.set('Choisis le Nombre de Particules')
+Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
+
+examplelabel = Label(Frame2, textvariable=example, width=100)
+examplelabel.pack()
 
 
+# Function to display some data
+def recupere():
+    ##To get the value
+    interface.setvar(name="Nbr_particles", value=s.get())
+    example.set("Nombre d'individus" + interface.getvar(name="Nbr_particles"))
+    print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
+
+    deplacement()  # Remove it and put the one down to avoid multiple clicking
+
+
+# Creation of a Button "Validate":
+Bouton_Valider = Button(Frame2, text='Lancer', command=recupere)
+Bouton_Valider.pack()  # We add the button to the display of interface tk
 
 ### VARIABLES
 w_porte = 30
+coord_sortie = [0, height / 2]
 
 
 #####TRASH##############
@@ -39,7 +58,6 @@ def CreaPart(number):
         xcoord = (width - 40) * random.random() + 30
         ycoord = (height - 40) * random.random() + 30
 
-        coord_sortie = [0, height / 2]
         D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
         # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
         # print(D)
@@ -51,6 +69,7 @@ def CreaPart(number):
 
         # vx = random.random() * 10
         # vy = random.random() * 10
+        # vx, vy = [0, 0]
 
         p = People(xcoord, ycoord, vx, vy)
         my_particles.append(p)
@@ -75,32 +94,28 @@ def CreaCrowd(my_particles):
     # return my_particles
 
     # Initialisation des particules sur forme de grille
-        i=5
-        j=4
-        for k in range(0, len(my_particles)):
-            my_particles[k].vx = 0
-            my_particles[k].vy = 0
-            # my_particles[k].xcoord = 40
-            # my_particles[k].ycoord = 40
-            if 40*i<=420:
-                i=i+1
-                my_particles[k].xcoord = 40 * i
-                my_particles[k].ycoord = 40 * j
-            else :
-                i=1
-                j=j+1
-                my_particles[k].xcoord = 40
-                my_particles[k].ycoord = 40 * j
+    i = 5
+    j = 4
+    for k in range(0, len(my_particles)):
+        my_particles[k].vx = 0
+        my_particles[k].vy = 0
+        # my_particles[k].xcoord = 40
+        # my_particles[k].ycoord = 40
+        if 40 * i <= 420:
+            i = i + 1
+            my_particles[k].xcoord = 40 * i
+            my_particles[k].ycoord = 40 * j
+        else:
+            i = 1
+            j = j + 1
+            my_particles[k].xcoord = 40
+            my_particles[k].ycoord = 40 * j
 
-        return my_particles
-
-
+    return my_particles
 
 
 # Compute and give the adapted speed for the particles to reach the door
 def ComputeTraject(my_particles):
-    coord_sortie = [0, height / 2]
-
     for i in range(0, len(my_particles)):
         # Compute the distance
         D = [my_particles[i].xcoord - coord_sortie[0], my_particles[i].ycoord - coord_sortie[1]]
@@ -166,7 +181,7 @@ def deplacement():
 
             if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
-                p[i].color="green"
+                p[i].color = "green"
                 if p[i] not in part_out:
                     part_out.append(p[i])
             else:
@@ -179,11 +194,11 @@ def deplacement():
         for j in range(0, len(ListPart)):
             # Check for collision
             if p[i].distance_collision(p[j]) <= 20:
-                if p[i].DistanceSortie([0, height / 2])<p[j].DistanceSortie([0, height / 2]):
-                    while True:
+                if p[i].DistanceSortie([0, height / 2]) < p[j].DistanceSortie([0, height / 2]):
+                    while True:  # To create an ordered line
                         p[i].xcoord = p[i].xcoord + p[i].vx
                         p[i].ycoord = p[i].ycoord + p[i].vy
-                        p[j].xcoord = p[j].xcoord
+                        p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
                         p[j].ycoord = p[j].ycoord
                         p[i].color = "Red"
                         if p[i].distance_collision(p[j]) > 20:
@@ -194,7 +209,6 @@ def deplacement():
                     p[i].xcoord = p[i].xcoord
                     p[i].ycoord = p[i].ycoord
                     p[j].color = "Blue"
-
 
         ### Check for collisions between the balls ####
         # for j in range(i + 1, len(ListPart)):
@@ -247,24 +261,24 @@ def deplacement():
         #         if (p[i].xcoord - p[j].xcoord) > 20:
         #             p[j].ComputeTraj([0, height / 2])
 
-                ##Trying to create the collision angle to reset properly the direction
-                # converter = math.pi / 180  # to convert degrees in radians
-                # if nx == 0:
-                #     p[j].angle = math.pi / 2
-                # else:
-                #     p[j].angle = math.atan(ny / nx)
+        ##Trying to create the collision angle to reset properly the direction
+        # converter = math.pi / 180  # to convert degrees in radians
+        # if nx == 0:
+        #     p[j].angle = math.pi / 2
+        # else:
+        #     p[j].angle = math.atan(ny / nx)
 
-                # Replace them so as to avoid overlapping
-                # p[j].xcoord += random.random()*7
-                # p[j].ycoord += random.random()*7
-                # p[i].xcoord -= random.random()*7
-                # p[i].ycoord -= random.random()*7
+        # Replace them so as to avoid overlapping
+        # p[j].xcoord += random.random()*7
+        # p[j].ycoord += random.random()*7
+        # p[i].xcoord -= random.random()*7
+        # p[i].ycoord -= random.random()*7
 
-                # if (interface.find_overlapping(p[i].xcoord, p[i].ycoord, p[j].xcoord, p[j].ycoord) == 0):
-                #     p[j].ComputeTraj([0, height / 2])
-                # else:
-                #     p[j].xcoord += random.random() * 5
-                #     p[j].ycoord += random.random() * 5
+        # if (interface.find_overlapping(p[i].xcoord, p[i].ycoord, p[j].xcoord, p[j].ycoord) == 0):
+        #     p[j].ComputeTraj([0, height / 2])
+        # else:
+        #     p[j].xcoord += random.random() * 5
+        #     p[j].ycoord += random.random() * 5
 
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
@@ -282,10 +296,10 @@ def suppr():
     interface.delete('all')
 
 
-particles = CreaPart(50)
-# ListPart = particles
+particles = CreaPart(
+    50)  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
 ListPart = CreaCrowd(particles)
-deplacement()
+# deplacement() #Take off the comment to simplify
 
 # On lance la boucle principale:
 Simulation.mainloop()

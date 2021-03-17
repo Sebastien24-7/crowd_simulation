@@ -36,7 +36,7 @@ class People():
         self.angle = 0
         self.vx, self.vy = (vx, vy)
         self.radius = 1
-        self.out = False
+        self.good_pos = False
 
     def __str__(self):
         """
@@ -67,6 +67,7 @@ class People():
         coord_sortie=[0,-20]
         D=[self.xcoord-coord_sortie[0],self.ycoord-coord_sortie[1]]
         D_norm=D/numpy.linalg.norm(D)
+
         return D_norm
 
     def ComputeTraj(self,coord_sortie):

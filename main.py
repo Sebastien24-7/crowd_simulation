@@ -1,8 +1,12 @@
 from tkinter import *
 from tkinter.messagebox import showinfo
 
+import tk as tk
+
 fenetre = Tk()
 fenetre.title("Crow Simulation")
+
+Nbr_particles = IntVar(fenetre, name="Nbr_particles")
 
 
 ####
@@ -31,19 +35,21 @@ Frame1.pack(side=TOP, padx=100, pady=100)
 Frame2 = Frame(Frame1, borderwidth=2, relief=GROOVE, height=50, width=500)
 Frame2.pack(side=BOTTOM, padx=100, pady=100)
 
-# frame 3 dans frame 2
-Frame3 = Frame(Frame1, bg="white", borderwidth=2, relief=GROOVE, height=500, width=50)
-Frame3.pack(side=RIGHT, padx=5, pady=5)
-
 # Ajout de labels
 Label(Frame1, text="Frame 1").pack(padx=10, pady=10)
 Label(Frame2, text="Frame 2").pack(padx=10, pady=10)
-Label(Frame3, text="Frame 3", bg="white").pack(padx=10, pady=10)
+
+example = StringVar()
+examplelabel = Label(Frame2, textvariable=example)
+examplelabel.pack()
 
 
 #####
 def recupere():
-    showinfo("Alerte", entree.get())
+    ##To get the value
+    fenetre.setvar(name="Nbr_particles", value=s.get())
+    example.set("Nombre d'individus" + fenetre.getvar(name="Nbr_particles"))
+    print("Nombre d'individus", fenetre.getvar(name="Nbr_particles"))
 
 
 value = StringVar()
@@ -52,7 +58,23 @@ entree = Entry(Frame1, textvariable=value, width=30)
 entree.pack()
 
 bouton = Button(Frame1, text="Valider", command=recupere)
-bouton.pack()
+bouton.pack(padx=10, pady=10)
+
+s = Spinbox(Frame2, from_=10, to_=100)
+s.pack()
+
+bouton2 = Button(Frame2, text="Valider", command=recupere)
+bouton2.pack(padx=10, pady=10)
 
 fenetre.config(menu=menubar)
 fenetre.mainloop()
+
+# ##### Trying to set up the screen of simulation
+# s = Spinbox(Simulation, from_=10, to_=100, text='Choisis le Nombre de Particules', width=10)
+# s.pack()
+# example = StringVar()
+# examplelabel = Label(Simulation,text='Hello' , textvariable=example, width=10)
+# examplelabel.pack()
+# # ##To get the value
+# # interface.setvar(name="int", value=s.get())
+# # interface.pack()
