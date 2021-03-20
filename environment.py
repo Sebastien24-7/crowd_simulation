@@ -1,9 +1,10 @@
-import numpy as np
+from numpy import *
 import scipy as sp
 import sys
 import random
 import matplotlib
 import matplotlib.pyplot as plt
+import self
 
 from matplotlib.patches import Ellipse, Circle, Rectangle, Polygon
 from matplotlib.lines import Line2D
@@ -11,8 +12,9 @@ import PIL
 from PIL import Image
 from PIL import ImageDraw
 
-
 ###############################
+from numpy.ma import shape
+
 
 class Goal():
     """
