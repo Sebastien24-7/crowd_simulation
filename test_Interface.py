@@ -6,6 +6,8 @@ from People import *
 
 ##SETUP
 # On cree une fenetre et un canevas:
+from environment import *
+
 Simulation = Tk()
 Simulation.title("Crowd Simulation")
 width = 500
@@ -46,6 +48,7 @@ Bouton_Valider.pack()  # We add the button to the display of interface tk
 ### VARIABLES
 w_porte = 30
 coord_sortie = [0, height / 2]
+world = Room()
 
 
 #####TRASH##############
@@ -78,38 +81,40 @@ def CreaPart(number):
 
 ##Deal with the overlapping at the creation of the particles
 def CreaCrowd(my_particles):
-    # for i in range(0, len(my_particles)):
-    #     # Check it is inside the room (but not functional)
-    #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
-    #         my_particles[i].xcoord = (width - 80) * random.random() + 30
-    #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
-    #         my_particles[i].ycoord = (height - 80) * random.random() + 30
-    #
-    #     # Checking the overlapping between particles
-    #     for j in range(0, len(my_particles)):
-    #         if my_particles[i].distance_collision(my_particles[j]) < 25:
-    #             my_particles[i].xcoord = (width - 80) * random.random() + 30
-    #             my_particles[i].ycoord = (height - 80) * random.random() + 30
-    #
-    # return my_particles
+    ### RANDOM CROWD ####
+
+    for i in range(0, len(my_particles)):
+        #     # Check it is inside the room (but not functional)
+        #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
+        #         my_particles[i].xcoord = (width - 80) * random.random() + 30
+        #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
+        #         my_particles[i].ycoord = (height - 80) * random.random() + 30
+
+        # Checking the overlapping between particles
+        for j in range(0, len(my_particles)):
+            if my_particles[i].distance_collision(my_particles[j]) < 25:
+                my_particles[i].xcoord = (width - 80) * random.random() + 30
+                my_particles[i].ycoord = (height - 80) * random.random() + 30
+
+    ### ORDERED CROWD ####
 
     # Initialisation des particules sur forme de grille
-    i = 5
-    j = 4
-    for k in range(0, len(my_particles)):
-        my_particles[k].vx = 0
-        my_particles[k].vy = 0
-        # my_particles[k].xcoord = 40
-        # my_particles[k].ycoord = 40
-        if 40 * i <= 420:
-            i = i + 1
-            my_particles[k].xcoord = 40 * i
-            my_particles[k].ycoord = 40 * j
-        else:
-            i = 1
-            j = j + 1
-            my_particles[k].xcoord = 40
-            my_particles[k].ycoord = 40 * j
+    # i = 5
+    # j = 4
+    # for k in range(0, len(my_particles)):
+    #     my_particles[k].vx = 0
+    #     my_particles[k].vy = 0
+    #     # my_particles[k].xcoord = 40
+    #     # my_particles[k].ycoord = 40
+    #     if 40 * i <= 420:
+    #         i = i + 1
+    #         my_particles[k].xcoord = 40 * i
+    #         my_particles[k].ycoord = 40 * j
+    #     else:
+    #         i = 1
+    #         j = j + 1
+    #         my_particles[k].xcoord = 40
+    #         my_particles[k].ycoord = 40 * j
 
     return my_particles
 

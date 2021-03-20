@@ -66,10 +66,10 @@ class Room():
 
     """
 
-    def _init_(self, name='Room', background='White', pixel_size=1.0,
-               xmin=0.0, width=50,
-               ymin=0.0, height=50,
-               wall_colors=[[0, 0, 0]], ):
+    def __init__(self, name='Room', background='White', pixel_size=1.0,
+                 xmin=0.0, width=500,
+                 ymin=0.0, height=500,
+                 wall_colors=[[0, 0, 0]], ):
         """
         Constructor of a Room object
 
@@ -99,7 +99,21 @@ class Room():
         self.xmax = self.xmin + self.width * pixel_size
         self.ymax = self.ymin + self.height * pixel_size
 
-
+    def __str__(self):
+        """
+        Print this Room object
+        """
+        return "--> Je suis un objet Pièce " \
+               + "\n    name: " + str(self.name) \
+               + "\n    background: " + str(self.__background) \
+               + "\n    xmin: " + str(self.xmin) \
+               + "\n    ymin: " + str(self.ymin) \
+               + "\n    xmax: " + str(self.xmax) \
+               + "\n    ymax: " + str(self.ymax) \
+               + "\n    width: " + str(self.width) \
+               + "\n    height: " + str(self.height) \
+ \
+ \
 ###############################
 
 class Obstacle():
@@ -113,10 +127,9 @@ class Obstacle():
 
     """
 
-    def _init_(self, name='Goal', background='Black', pixel_size=1.0,
-               xcoord=0.0, width=50,
-               ycoord=0.0, height=50,
-               ):
+    def __init__(self, name='Goal', background='Black', pixel_size=1.0,
+                 xcoord=0.0, width=50,
+                 ycoord=0.0, height=50):
         """
         Constructor of an Obstacle object
         """
@@ -133,6 +146,18 @@ class Obstacle():
 
     pass
 
+    def __str__(self):
+        """
+        Print this Room object
+        """
+        return "--> Je suis un objet Obstacle " \
+               + "\n    name: " + str(self.name) \
+               + "\n    background: " + str(self.__background) \
+               + "\n    xcoord: " + str(self.xcoord) \
+               + "\n    ycoord: " + str(self.ycoord) \
+               + "\n    width: " + str(self.width) \
+               + "\n    height: " + str(self.height) \
+ \
     def add_shape(self, shape, outline_color=[0, 0, 0], fill_color=[255, 255, 255]):
         """To add a matplotlib shape:
         ``line2D``, ``circle``, ``ellipse``, ``rectangle`` or ``polygon``
