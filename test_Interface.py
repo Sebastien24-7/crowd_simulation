@@ -23,20 +23,32 @@ s = Spinbox(Frame2, from_=10, to_=100, width=10)
 s.pack()
 
 ##Variables attached to Simulation
-example = StringVar(interface, name="example")
+example = StringVar(Frame2, name="example")
 example.set('Choisis le Nombre de Particules')
+result = StringVar(Frame2, name="result")
+result.set('Nombre de Particules sorties :')
+
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
+Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
 examplelabel = Label(Frame2, textvariable=example, width=100)
+resultlabel = Label(Frame2, textvariable=result, width=100)
 examplelabel.pack()
+resultlabel.pack(padx=10)
 
 
 # Function to display some data
 def recupere():
     ##To get the value
     interface.setvar(name="Nbr_particles", value=s.get())
-    example.set("Nombre d'individus" + interface.getvar(name="Nbr_particles"))
+    example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
+
+    ## To update the screen of display
+    interface.setvar(name="Nbr_part_out", value=len(part_out))
+    result.set("Nombre d'individus sorties :" + (str)(
+        interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
+    print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
     deplacement()  # Remove it and put the one down to avoid multiple clicking
 
@@ -47,8 +59,10 @@ Bouton_Valider.pack()  # We add the button to the display of interface tk
 
 ### VARIABLES
 w_porte = 30
-coord_sortie = [0, height / 2]
-world = Room()
+part_out = []
+world = Room()  # The aim is to use it for everything linked to the creation of the room etc
+
+coord_sortie = [0, world.height / 2]
 
 
 #####TRASH##############
@@ -58,8 +72,8 @@ world = Room()
 def CreaPart(number):
     my_particles = []
     for i in range(0, number):
-        xcoord = (width - 40) * random.random() + 30
-        ycoord = (height - 40) * random.random() + 30
+        xcoord = (world.width - 40) * random.random() + 30
+        ycoord = (world.height - 40) * random.random() + 30
 
         D = [xcoord - coord_sortie[0], ycoord - coord_sortie[1]]
         # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
@@ -93,8 +107,8 @@ def CreaCrowd(my_particles):
         # Checking the overlapping between particles
         for j in range(0, len(my_particles)):
             if my_particles[i].distance_collision(my_particles[j]) < 25:
-                my_particles[i].xcoord = (width - 80) * random.random() + 30
-                my_particles[i].ycoord = (height - 80) * random.random() + 30
+                my_particles[i].xcoord = (world.width - 80) * random.random() + 30
+                my_particles[i].ycoord = (world.height - 80) * random.random() + 30
 
     ### ORDERED CROWD ####
 
@@ -136,12 +150,15 @@ def ComputeTraject(my_particles):
 # Create the environment
 def CreateEnv():
     # Create the room
-    interface.create_rectangle(20, 20, width - 20, height - 20, outline="red", width=5)
+    interface.create_rectangle(20, 20, world.width - 20, world.height - 20, outline="red", width=5)
     interface.pack()
     # Create the door
-    interface.create_line(20, (height / 2 - w_porte), 20, (height / 2 + w_porte), fill="green", width=5)
-    interface.create_rectangle(0, (height / 2 - w_porte), 20, (height / 2 + w_porte), fill="green", width=5)
+    interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
+    interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.pack()
+
+    # obs = Obstacle()
+    # obs.add_shape(Rectangle,outline_color=[0,0,0],fill_color=[255,255,255])
 
 
 # Creation of the Movement
@@ -151,7 +168,7 @@ def deplacement():
     p = ListPart
 
     # ComputeTraject(p)
-    part_out = []
+
     CreateEnv()
 
     # nombre=0
@@ -164,27 +181,27 @@ def deplacement():
         b = interface.create_oval(p[i].xcoord, p[i].ycoord, p[i].xcoord + 20, p[i].ycoord + 20, fill=p[i].color)
         interface.pack()
 
-        p[i].ComputeTraj([0, height / 2])
+        p[i].ComputeTraj([0, world.height / 2])
 
         # Check for bouncing on the walls or going through the door
 
         # Speed reduced to 0 outside of the room
-        if (0 < p[i].xcoord < 15) & ((height / 2 - w_porte) < p[i].ycoord < (height / 2 + w_porte)):
+        if (0 < p[i].xcoord < 15) & ((world.height / 2 - w_porte) < p[i].ycoord < (world.height / 2 + w_porte)):
             p[i].vx, p[i].vy = [0, 0]
             # nombre = nombre+1
             # print(nombre)
-        if interface.coords(b)[3] > height - 30:
+        if interface.coords(b)[3] > world.height - 30:
             p[i].vy = -p[i].vy
 
         if interface.coords(b)[1] < 25:
             p[i].vy = -p[i].vy
 
-        if interface.coords(b)[2] > width - 30:
+        if interface.coords(b)[2] > world.width - 30:
             p[i].vx = -p[i].vx
 
         if interface.coords(b)[0] < 20:
 
-            if (height / 2 - w_porte) < interface.coords(b)[1] < (height / 2 + w_porte) - 20:
+            if (height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
                 p[i].color = "green"
                 if p[i] not in part_out:
@@ -199,7 +216,7 @@ def deplacement():
         for j in range(0, len(ListPart)):
             # Check for collision
             if p[i].distance_collision(p[j]) <= 20:
-                if p[i].DistanceSortie([0, height / 2]) < p[j].DistanceSortie([0, height / 2]):
+                if p[i].DistanceSortie([0, world.height / 2]) < p[j].DistanceSortie([0, world.height / 2]):
                     while True:  # To create an ordered line
                         p[i].xcoord = p[i].xcoord + p[i].vx
                         p[i].ycoord = p[i].ycoord + p[i].vy
@@ -208,6 +225,7 @@ def deplacement():
                         p[i].color = "Red"
                         if p[i].distance_collision(p[j]) > 20:
                             break
+                            print("It's finished")
                 else:
                     p[j].xcoord = p[j].xcoord + p[j].vx
                     p[j].ycoord = p[j].ycoord + p[j].vy
@@ -302,7 +320,7 @@ def suppr():
 
 
 particles = CreaPart(
-    50)  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
+    40)  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
 ListPart = CreaCrowd(particles)
 # deplacement() #Take off the comment to simplify
 
