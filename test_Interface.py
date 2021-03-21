@@ -1,6 +1,7 @@
 import math
 import random
-import time
+from datetime import datetime
+from time import *
 from tkinter import *
 from People import *
 
@@ -33,8 +34,10 @@ Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
 examplelabel = Label(Frame2, textvariable=example, width=100)
 resultlabel = Label(Frame2, textvariable=result, width=100)
+chronolabel = Label(Frame2, text="Welcome To Crowd Simulator!", fg="black", font="Verdana 15 bold")
 examplelabel.pack()
 resultlabel.pack(padx=10)
+chronolabel.pack()
 
 
 # Function to display some data
@@ -61,8 +64,55 @@ Bouton_Valider.pack()  # We add the button to the display of interface tk
 w_porte = 30
 part_out = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
-
+counter = 0  # Used for the time
+display = "Hey"  # Used for the time
 coord_sortie = [0, world.height / 2]
+
+
+###########
+
+# Function to take the time needed to get out of the room
+def count():
+    global counter
+    global display
+
+    # Il manque le temps d'initialisation à enlever autour de 1,0 à 1,20 s.
+    tt = datetime.fromtimestamp(counter)
+    string = tt.strftime("%M:%S")
+    display = string
+
+    chronolabel['text'] = display  # Or label.config(text=display)
+
+    # label.after(arg1, arg2) delays by
+    # first argument given in milliseconds
+    # and then calls the function given as second argument.
+    # Generally like here we need to call the
+    # function in which it is present repeatedly.
+    # Delays by 1000ms=1 seconds and call count again.
+    chronolabel.after(2000, count)  # I bidouille car le laps de temps ne paraît pas très réel
+    counter += 1
+
+    ### Another way to do it : ###
+
+
+# define the countdown func. (so as to count the number of people getting out in a limited amount of time
+def countdown(t):
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
+        t -= 1
+
+    print('Fire in the Building!!')
+
+
+# To uncomment so as to use it
+# # input time in seconds
+# t = input("Enter the time in seconds: ")
+#
+# # function call
+# countdown(int(t))
 
 
 #####TRASH##############
@@ -166,15 +216,10 @@ def deplacement():
     interface.delete('all')
 
     p = ListPart
-
     # ComputeTraject(p)
 
     CreateEnv()
-
-    # nombre=0
-    # n = StringVar(nombre)
-    # texteLabel = Label(Simulation, text=StringVar(nombre))
-    # texteLabel.pack()
+    count()
 
     for i in range(0, len(p)):
 
@@ -188,8 +233,7 @@ def deplacement():
         # Speed reduced to 0 outside of the room
         if (0 < p[i].xcoord < 15) & ((world.height / 2 - w_porte) < p[i].ycoord < (world.height / 2 + w_porte)):
             p[i].vx, p[i].vy = [0, 0]
-            # nombre = nombre+1
-            # print(nombre)
+
         if interface.coords(b)[3] > world.height - 30:
             p[i].vy = -p[i].vy
 
@@ -312,6 +356,7 @@ def deplacement():
     # Stop the code if everyone is out
     if len(part_out) == len(p):
         print("Everyone is out of the room")
+        print("And all of them get out in :" + display + "seconds")
         exit()
 
 

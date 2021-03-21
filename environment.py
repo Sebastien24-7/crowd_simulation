@@ -160,6 +160,8 @@ class Obstacle():
                + "\n    width: " + str(self.width) \
                + "\n    height: " + str(self.height) \
  \
+            ############
+
     def add_shape(self, shape, outline_color=[0, 0, 0], fill_color=[255, 255, 255]):
         """To add a matplotlib shape:
         ``line2D``, ``circle``, ``ellipse``, ``rectangle`` or ``polygon``
