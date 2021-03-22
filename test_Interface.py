@@ -20,7 +20,7 @@ interface.pack(padx=50, pady=50)
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
 Frame2.pack(side=TOP, padx=10, pady=10)
 
-s = Spinbox(Frame2, from_=10, to_=100, width=10)
+s = Spinbox(Frame2, from_=0, to_=100, width=10)
 s.pack()
 
 ##Variables attached to Simulation
@@ -39,34 +39,50 @@ examplelabel.pack()
 resultlabel.pack(padx=10)
 chronolabel.pack()
 
+### VARIABLES
+w_porte = 30
+part_out = []
+ListPart = []
+launch = False
+world = Room()  # The aim is to use it for everything linked to the creation of the room etc
+counter = 0  # Used for the time
+display = "Hey"  # Used for the time
+coord_sortie = [0, world.height / 2]
+
 
 # Function to display some data
-def recupere():
+def lancer():
     ##To get the value
+    global launch
+    global ListPart
+
     interface.setvar(name="Nbr_particles", value=s.get())
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
+    launch = True
 
+    # Get the real value of the number of particles
+    if (int)(s.get()) != 0:
+        particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))
+        ListPart = CreaCrowd(particles)
+        deplacement()
+
+
+def resfresh():
     ## To update the screen of display
     interface.setvar(name="Nbr_part_out", value=len(part_out))
     result.set("Nombre d'individus sorties :" + (str)(
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
-    deplacement()  # Remove it and put the one down to avoid multiple clicking
-
 
 # Creation of a Button "Validate":
-Bouton_Valider = Button(Frame2, text='Lancer', command=recupere)
-Bouton_Valider.pack()  # We add the button to the display of interface tk
+Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer)
+Bouton_Lancer.pack()  # We add the button to the display of interface tk
 
-### VARIABLES
-w_porte = 30
-part_out = []
-world = Room()  # The aim is to use it for everything linked to the creation of the room etc
-counter = 0  # Used for the time
-display = "Hey"  # Used for the time
-coord_sortie = [0, world.height / 2]
+# Creation of a Button "Refresh":
+Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=resfresh)
+Bouton_Refresh.pack(padx=50)  # We add the button to the display of interface tk
 
 
 ###########
@@ -89,7 +105,7 @@ def count():
     # Generally like here we need to call the
     # function in which it is present repeatedly.
     # Delays by 1000ms=1 seconds and call count again.
-    chronolabel.after(2000, count)  # I bidouille car le laps de temps ne paraît pas très réel
+    chronolabel.after(1000, count)  # I bidouille car le laps de temps ne paraît pas très réel
     counter += 1
 
     ### Another way to do it : ###
@@ -147,38 +163,37 @@ def CreaPart(number):
 def CreaCrowd(my_particles):
     ### RANDOM CROWD ####
 
-    for i in range(0, len(my_particles)):
-        #     # Check it is inside the room (but not functional)
-        #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
-        #         my_particles[i].xcoord = (width - 80) * random.random() + 30
-        #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
-        #         my_particles[i].ycoord = (height - 80) * random.random() + 30
+    # for i in range(0, len(my_particles)):
+    #     # Check it is inside the room (but not functional)
+    # #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
+    # #         my_particles[i].xcoord = (width - 80) * random.random() + 30
+    # #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
+    # #         my_particles[i].ycoord = (height - 80) * random.random() + 30
+    #
+    # # Checking the overlapping between particles
+    # for j in range(0, len(my_particles)):
+    #     if my_particles[i].distance_collision(my_particles[j]) < 25:
+    #         my_particles[i].xcoord = (world.width - 80) * random.random() + 30
+    #         my_particles[i].ycoord = (world.height - 80) * random.random() + 30
 
-        # Checking the overlapping between particles
-        for j in range(0, len(my_particles)):
-            if my_particles[i].distance_collision(my_particles[j]) < 25:
-                my_particles[i].xcoord = (world.width - 80) * random.random() + 30
-                my_particles[i].ycoord = (world.height - 80) * random.random() + 30
-
-    ### ORDERED CROWD ####
-
+    ## ORDERED CROWD ####
     # Initialisation des particules sur forme de grille
-    # i = 5
-    # j = 4
-    # for k in range(0, len(my_particles)):
-    #     my_particles[k].vx = 0
-    #     my_particles[k].vy = 0
-    #     # my_particles[k].xcoord = 40
-    #     # my_particles[k].ycoord = 40
-    #     if 40 * i <= 420:
-    #         i = i + 1
-    #         my_particles[k].xcoord = 40 * i
-    #         my_particles[k].ycoord = 40 * j
-    #     else:
-    #         i = 1
-    #         j = j + 1
-    #         my_particles[k].xcoord = 40
-    #         my_particles[k].ycoord = 40 * j
+    i = 0
+    j = 1
+    for k in range(0, len(my_particles)):
+        my_particles[k].vx = 0
+        my_particles[k].vy = 0
+        # my_particles[k].xcoord = 40
+        # my_particles[k].ycoord = 40
+        if 40 * i <= 420:
+            i = i + 1
+            my_particles[k].xcoord = 40 * i
+            my_particles[k].ycoord = 40 * j
+        else:
+            i = 1
+            j = j + 1
+            my_particles[k].xcoord = 40
+            my_particles[k].ycoord = 40 * j
 
     return my_particles
 
@@ -356,7 +371,7 @@ def deplacement():
     # Stop the code if everyone is out
     if len(part_out) == len(p):
         print("Everyone is out of the room")
-        print("And all of them get out in :" + display + "seconds")
+        print("And all of them get out in " + display + "seconds")
         exit()
 
 
@@ -364,10 +379,12 @@ def suppr():
     interface.delete('all')
 
 
-particles = CreaPart(
-    40)  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
-ListPart = CreaCrowd(particles)
-# deplacement() #Take off the comment to simplify
+##### Old Version to use to work
+
+#     particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
+#     print("It works hereeeee")
+#     ListPart = CreaCrowd(particles)
+#     deplacement() #Take off the comment to simplify
 
 # On lance la boucle principale:
 Simulation.mainloop()
