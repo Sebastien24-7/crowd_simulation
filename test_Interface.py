@@ -2,6 +2,7 @@ import math
 import random
 from datetime import datetime
 from time import *
+from timeit import default_timer
 from tkinter import *
 from People import *
 
@@ -20,8 +21,8 @@ interface.pack(padx=50, pady=50)
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
 Frame2.pack(side=TOP, padx=10, pady=10)
 
-s = Spinbox(Frame2, from_=0, to_=100, width=10)
-s.pack()
+sp = Spinbox(Frame2, from_=0, to_=100, width=10)
+sp.pack()
 
 ##Variables attached to Simulation
 example = StringVar(Frame2, name="example")
@@ -43,28 +44,30 @@ chronolabel.pack()
 w_porte = 30
 part_out = []
 ListPart = []
-launch = False
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
-counter = 0  # Used for the time
-display = "Hey"  # Used for the time
 coord_sortie = [0, world.height / 2]
+str_time = ""
 
+
+#####TRASH##############
+# Not Useful anymore
 
 # Function to display some data
 def lancer():
     ##To get the value
     global launch
     global ListPart
+    global start
 
-    interface.setvar(name="Nbr_particles", value=s.get())
+    interface.setvar(name="Nbr_particles", value=sp.get())
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
-    launch = True
 
     # Get the real value of the number of particles
-    if (int)(s.get()) != 0:
+    if (int)(sp.get()) != 0:
         particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))
         ListPart = CreaCrowd(particles)
+        start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
         deplacement()
 
 
@@ -86,29 +89,15 @@ Bouton_Refresh.pack(padx=50)  # We add the button to the display of interface tk
 
 
 ###########
-
 # Function to take the time needed to get out of the room
-def count():
-    global counter
-    global display
-
-    # Il manque le temps d'initialisation à enlever autour de 1,0 à 1,20 s.
-    tt = datetime.fromtimestamp(counter)
-    string = tt.strftime("%M:%S")
-    display = string
-
-    chronolabel['text'] = display  # Or label.config(text=display)
-
-    # label.after(arg1, arg2) delays by
-    # first argument given in milliseconds
-    # and then calls the function given as second argument.
-    # Generally like here we need to call the
-    # function in which it is present repeatedly.
-    # Delays by 1000ms=1 seconds and call count again.
-    chronolabel.after(1000, count)  # I bidouille car le laps de temps ne paraît pas très réel
-    counter += 1
-
-    ### Another way to do it : ###
+def updateTime():
+    global str_time
+    now = default_timer() - start
+    minutes, seconds = divmod(now, 60)
+    hours, minutes = divmod(minutes, 60)
+    str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    chronolabel['text'] = str_time
+    chronolabel.after(1000, updateTime)
 
 
 # define the countdown func. (so as to count the number of people getting out in a limited amount of time
@@ -122,7 +111,6 @@ def countdown(t):
 
     print('Fire in the Building!!')
 
-
 # To uncomment so as to use it
 # # input time in seconds
 # t = input("Enter the time in seconds: ")
@@ -130,9 +118,6 @@ def countdown(t):
 # # function call
 # countdown(int(t))
 
-
-#####TRASH##############
-# Not Useful anymore
 
 # Creation of the list of people
 def CreaPart(number):
@@ -234,7 +219,7 @@ def deplacement():
     # ComputeTraject(p)
 
     CreateEnv()
-    count()
+    updateTime()  # So as to get the real time
 
     for i in range(0, len(p)):
 
@@ -268,8 +253,9 @@ def deplacement():
             else:
                 p[i].vx = -p[i].vx
 
-        p[i].xcoord = p[i].xcoord + p[i].vx
-        p[i].ycoord = p[i].ycoord + p[i].vy
+        ## Was used to compute the old speed
+        # p[i].xcoord = p[i].xcoord + p[i].vx
+        # p[i].ycoord = p[i].ycoord + p[i].vy
 
         ## Check for collisions between the balls ####
         for j in range(0, len(ListPart)):
@@ -364,14 +350,13 @@ def deplacement():
 
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
-
     particles_out = len(part_out)
     print(particles_out)
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
         print("Everyone is out of the room")
-        print("And all of them get out in " + display + "seconds")
+        print("And all of them get out in " + (str)(str_time) + "seconds")
         exit()
 
 
