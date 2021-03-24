@@ -22,20 +22,23 @@ class People():
     radius: int
 
     """
-    def __init__(self,xcoord,ycoord,vx,vy):
+    def __init__(self, xcenter, ycenter, vx, vy):
         """
         Constructor of a Particle object
         """
         self.name = "Particle"
         colors = ["red", "orange", "yellow", "green", "blue", "violet"]
-        #self.color = random.choice(colors)
-        self.color ="#{:06x}".format(random.randint(0, 0xffffff))
-        self.xcoord, self.ycoord = [xcoord, ycoord]  # They are the coordinates of the center of the particle
+        # self.color = random.choice(colors)
+        self.color = "#{:06x}".format(random.randint(0, 0xffffff))
+        self.xcenter, self.ycenter = [xcenter, ycenter]  # Used for computing distance between particles
+        self.xcoord, self.ycoord = [xcenter - 8, ycenter - 8]  # They are the coordinates of the center of the particle
+
+        self.radius = math.sqrt(math.pow(self.xcenter - self.xcoord, 2) + math.pow(self.ycenter - self.ycoord, 2))
+
         self.touched = 0
         self.masse = 1
         self.angle = 0
         self.vx, self.vy = (vx, vy)
-        self.radius = 1
         self.good_pos = False
         self.time=0
 
@@ -46,9 +49,12 @@ class People():
         return "--> Je suis un objet People " \
                + "\n    name: " + str(self.name) \
                + "\n    color: " + str(self.color) \
+               + "\n    mon centre xcenter: " + str(self.xcenter) \
+               + "\n    mon centre ycenter: " + str(self.ycenter) \
                + "\n    xcoord: " + str(self.xcoord) \
                + "\n    ycoord: " + str(self.ycoord) \
                + "\n    touched: " + str(self.touched) \
+               + "\n    mon rayon : " + str(self.radius) \
  \
             ############
 
@@ -57,28 +63,32 @@ class People():
         Determines the distance between of all the particles
         """
         # the ** is the operator for square
-        distance = math.sqrt(((particle.xcoord + 10) - (self.xcoord + 10)) ** 2 +
-                             ((particle.ycoord + 10) - (self.ycoord + 10)) ** 2)
+        distance = math.sqrt(((particle.xcenter + particle.radius) - (self.xcenter + self.radius)) ** 2 +
+                             ((particle.ycenter + particle.radius) - (self.ycenter + self.radius)) ** 2)
         return distance
+
+        # # the ** is the operator for square
+        # distance = math.sqrt(((particle.xcenter + particle.radius) - (self.xcenter + self.radius)) ** 2 +
+        #                      ((particle.ycenter + particle.radius) - (self.ycenter + self.radius)) ** 2)
+        # return distance
 
     def people_target_distance(self):
         """
         Determines the distance for all the particles between them and their targets
         """
-        coord_sortie=[0,-20]
-        D=[self.xcoord-coord_sortie[0],self.ycoord-coord_sortie[1]]
-        D_norm=D/numpy.linalg.norm(D)
+        coord_sortie = [0, -20]
+        D = [self.xcenter - coord_sortie[0], self.ycenter - coord_sortie[1]]
+        D_norm = D / numpy.linalg.norm(D)
 
         return D_norm
 
-    def ComputeTraj(self,coord_sortie):
+    def ComputeTraj(self, coord_sortie):
+        self.vx = (coord_sortie[0] - self.xcenter) / math.sqrt(
+            (self.xcenter - coord_sortie[0]) ** 2 + (self.ycenter - coord_sortie[1]) ** 2)
+        self.vy = (coord_sortie[1] - self.ycenter) / math.sqrt(
+            (self.xcenter - coord_sortie[0]) ** 2 + (self.ycenter - coord_sortie[1]) ** 2)
 
-        self.vx= (coord_sortie[0] - self.xcoord) / math.sqrt(
-            (self.xcoord - coord_sortie[0]) ** 2 + (self.ycoord - coord_sortie[1]) ** 2)
-        self.vy= (coord_sortie[1] - self.ycoord) / math.sqrt(
-            (self.xcoord - coord_sortie[0]) ** 2 + (self.ycoord - coord_sortie[1]) ** 2)
-
-    def DistanceSortie(self,coord_sortie):
-        delta_x=coord_sortie[0] - self.xcoord
-        delta_y=coord_sortie[1] - self.ycoord
+    def DistanceSortie(self, coord_sortie):
+        delta_x = coord_sortie[0] - self.xcenter
+        delta_y = coord_sortie[1] - self.ycenter
         return math.sqrt(delta_x ** 2 + delta_y ** 2)
