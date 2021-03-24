@@ -203,10 +203,12 @@ def ComputeTraject(my_particles):
 def CreateEnv():
     # Create the room
     interface.create_rectangle(20, 20, world.width - 20, world.height - 20, outline="red", width=5)
-    interface.pack()
     # Create the door
     interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
+    # Create the wall
+    interface.create_rectangle(90, (world.height / 2 - w_porte), 105, (world.height / 2 + w_porte), fill="black")
+
     interface.pack()
 
     # obs = Obstacle()
@@ -269,26 +271,26 @@ def deplacement():
         # ## Check for collisions between the balls ####
         for j in range(0, len(ListPart)):
             # Check for collision
-            if (p[i].distance_collision(p[j]) <= 20):
-                if (p[i].DistanceSortie([0, world.height / 2]) <= p[j].DistanceSortie([0, world.height / 2])):
-                    if p[i].xcoord<0:
+            if p[i].distance_collision(p[j]) <= p[i].radius + p[j].radius:
+                if p[i].DistanceSortie([0, world.height / 2]) <= p[j].DistanceSortie([0, world.height / 2]):
+                    if p[i].xcenter < 0:
                         break
-                    p[i].xcoord = p[i].xcoord + p[i].vx
-                    p[i].ycoord = p[i].ycoord + p[i].vy
+                    p[i].xcenter = p[i].xcenter + p[i].vx
+                    p[i].ycenter = p[i].ycenter + p[i].vy
                     print(p[i].vy)
-                    p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
-                    p[j].ycoord = p[j].ycoord
+                    p[j].xcenter = p[j].xcenter  # Stays behind the particle closer to the door
+                    p[j].ycenter = p[j].ycenter
                     p[i].color = "Red"
                     # if p[i].distance_collision(p[j]) > 20:
                     #     print("It's finished")
                     #     break
                 else:
-                    if p[i].xcoord<0:
+                    if p[i].xcenter < 0:
                         break
-                    p[j].xcoord = p[j].xcoord + p[j].vx
-                    p[j].ycoord = p[j].ycoord + p[j].vy
-                    p[i].xcoord = p[i].xcoord
-                    p[i].ycoord = p[i].ycoord
+                    p[j].xcenter = p[j].xcenter + p[j].vx
+                    p[j].ycenter = p[j].ycenter + p[j].vy
+                    p[i].xcenter = p[i].xcenter
+                    p[i].ycenter = p[i].ycenter
                     p[j].color = "Blue"
 
         ### Check for collisions between the balls ####
