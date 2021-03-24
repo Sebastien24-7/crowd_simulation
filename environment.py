@@ -4,7 +4,7 @@ import sys
 import random
 import matplotlib
 import matplotlib.pyplot as plt
-import self
+
 
 from matplotlib.patches import Ellipse, Circle, Rectangle, Polygon
 from matplotlib.lines import Line2D

@@ -150,10 +150,10 @@ def CreaCrowd(my_particles):
 
     # for i in range(0, len(my_particles)):
     #     # Check it is inside the room (but not functional)
-    # #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
-    # #         my_particles[i].xcoord = (width - 80) * random.random() + 30
-    # #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
-    # #         my_particles[i].ycoord = (height - 80) * random.random() + 30
+    #     if 25 > my_particles[i].xcoord or my_particles[i].xcoord > width - 50:
+    #         my_particles[i].xcoord = (width - 80) * random.random() + 30
+    #     if 25 > my_particles[i].ycoord or my_particles[i].ycoord > height - 50:
+    #         my_particles[i].ycoord = (height - 80) * random.random() + 30
     #
     # # Checking the overlapping between particles
     # for j in range(0, len(my_particles)):
@@ -204,6 +204,7 @@ def CreateEnv():
     interface.pack()
     # Create the door
     interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
+    interface.create_line(100, (world.height / 2 - w_porte), 100, (world.height / 2 + w_porte), fill="black", width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.pack()
 
@@ -245,13 +246,19 @@ def deplacement():
 
         if interface.coords(b)[0] < 20:
 
-            if (height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
+            if (world.height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
                 p[i].color = "green"
                 if p[i] not in part_out:
                     part_out.append(p[i])
             else:
                 p[i].vx = -p[i].vx
+        # le mur
+        if 90 < interface.coords(b)[0] < 105:
+            if (world.height / 2 - w_porte)-20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
+                p[i].vx, p[i].vy = [0, -p[i].vy]
+                p[i].color = "black"
+
 
         ## Was used to compute the old speed
         # p[i].xcoord = p[i].xcoord + p[i].vx
@@ -260,25 +267,29 @@ def deplacement():
         ## Check for collisions between the balls ####
         for j in range(0, len(ListPart)):
             # Check for collision
-            if p[i].distance_collision(p[j]) <= 20:
-                if p[i].DistanceSortie([0, world.height / 2]) < p[j].DistanceSortie([0, world.height / 2]):
-                    while True:  # To create an ordered line
-                        p[i].xcoord = p[i].xcoord + p[i].vx
-                        p[i].ycoord = p[i].ycoord + p[i].vy
-                        p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
-                        p[j].ycoord = p[j].ycoord
-                        p[i].color = "Red"
-                        if p[i].distance_collision(p[j]) > 20:
-                            break
-                            print("It's finished")
+            if (p[i].distance_collision(p[j]) <= 20):
+                if (p[i].DistanceSortie([0, world.height / 2]) <= p[j].DistanceSortie([0, world.height / 2])):
+                    if p[i].xcoord<0:
+                        break
+                    p[i].xcoord = p[i].xcoord + p[i].vx
+                    p[i].ycoord = p[i].ycoord + p[i].vy
+                    print(p[i].vy)
+                    p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
+                    p[j].ycoord = p[j].ycoord
+                    p[i].color = "Red"
+                    # if p[i].distance_collision(p[j]) > 20:
+                    #     print("It's finished")
+                    #     break
                 else:
+                    if p[i].xcoord<0:
+                        break
                     p[j].xcoord = p[j].xcoord + p[j].vx
                     p[j].ycoord = p[j].ycoord + p[j].vy
                     p[i].xcoord = p[i].xcoord
                     p[i].ycoord = p[i].ycoord
                     p[j].color = "Blue"
 
-        ### Check for collisions between the balls ####
+        ## Check for collisions between the balls ####
         # for j in range(i + 1, len(ListPart)):
         #     # Check for collision
         #     if p[i].distance_collision(p[j]) < 20:

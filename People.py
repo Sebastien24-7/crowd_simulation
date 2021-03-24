@@ -37,6 +37,7 @@ class People():
         self.vx, self.vy = (vx, vy)
         self.radius = 1
         self.good_pos = False
+        self.time=0
 
     def __str__(self):
         """
