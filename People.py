@@ -22,16 +22,37 @@ class People():
     radius: int
 
     """
-    def __init__(self, xcenter, ycenter, vx, vy):
+    def __init__(self, xcenter, ycenter, vx, vy, type):
         """
         Constructor of a Particle object
         """
-        self.name = "Particle"
+
         colors = ["red", "orange", "yellow", "green", "blue", "violet"]
         # self.color = random.choice(colors)
         self.color = "#{:06x}".format(random.randint(0, 0xffffff))
         self.xcenter, self.ycenter = [xcenter, ycenter]  # Used for computing distance between particles
         self.xcoord, self.ycoord = [xcenter - 8, ycenter - 8]  # They are the coordinates of the center of the particle
+
+        #### To create a random crowd with every kind of people
+        if type == "kid":
+            self.xcoord, self.ycoord = [xcenter - 7,
+                                        ycenter - 7]  # They are the coordinates of the center of the particle
+            self.masse = 0.5
+            self.name = "Enfant"
+            self.color = "green"
+        if type == "adult":
+            self.xcoord, self.ycoord = [xcenter - 8,
+                                        ycenter - 8]  # They are the coordinates of the center of the particle
+            self.masse = 1
+            self.name = "Adulte"
+            self.color = "purple"
+        if type == "old":
+            self.xcoord, self.ycoord = [xcenter - 9,
+                                        ycenter - 9]  # They are the coordinates of the center of the particle
+            self.masse = 1.5
+            self.name = "Ancien"
+            self.color = "yellow"
+        ####
 
         self.radius = math.sqrt(math.pow(self.xcenter - self.xcoord, 2) + math.pow(self.ycenter - self.ycoord, 2))
 
@@ -40,7 +61,7 @@ class People():
         self.angle = 0
         self.vx, self.vy = (vx, vy)
         self.good_pos = False
-        self.time=0
+        self.time = 0
 
     def __str__(self):
         """

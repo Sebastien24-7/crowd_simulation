@@ -123,6 +123,7 @@ def countdown(t):
 # Creation of the list of people
 def CreaPart(number):
     my_particles = []
+    possible_types = ["kid", "adult", "old"]
     for i in range(0, number):
         xcenter = (world.width - 40) * random.random() + 30
         ycenter = (world.height - 40) * random.random() + 30
@@ -140,7 +141,10 @@ def CreaPart(number):
         # vy = random.random() * 10
         # vx, vy = [0, 0]
 
-        p = People(xcenter, ycenter, vx, vy)
+        k = random.randrange(len(possible_types))
+        type = possible_types[k]
+
+        p = People(xcenter, ycenter, vx, vy, type)
         print(p)
         my_particles.append(p)
     return my_particles
@@ -150,37 +154,37 @@ def CreaPart(number):
 def CreaCrowd(my_particles):
     ### RANDOM CROWD ####
 
-    for i in range(0, len(my_particles)):
-        # # Check it is inside the room (but not functional)
-        # if (25 +my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (width - 50-my_particles[i].radius):
-        #     my_particles[i].xcenter = (width - 80) * random.random() + 30
-        # if (25 +my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (height - 50-my_particles[i].radius):
-        #     my_particles[i].ycenter = (height - 80) * random.random() + 30
-
-        # Checking the overlapping between particles
-        for j in range(0, len(my_particles)):
-            if my_particles[i].distance_collision(my_particles[j]) < (my_particles[i].radius + my_particles[j].radius):
-                my_particles[i].xcenter = (world.width - 80) * random.random() + 30
-                my_particles[i].ycenter = (world.height - 80) * random.random() + 30
+    # for i in range(0, len(my_particles)):
+    #     # # Check it is inside the room (but not functional)
+    #     # if (25 +my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (width - 50-my_particles[i].radius):
+    #     #     my_particles[i].xcenter = (width - 80) * random.random() + 30
+    #     # if (25 +my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (height - 50-my_particles[i].radius):
+    #     #     my_particles[i].ycenter = (height - 80) * random.random() + 30
+    #
+    #     # Checking the overlapping between particles
+    #     for j in range(0, len(my_particles)):
+    #         if my_particles[i].distance_collision(my_particles[j]) < (my_particles[i].radius + my_particles[j].radius):
+    #             my_particles[i].xcenter = (world.width - 80) * random.random() + 30
+    #             my_particles[i].ycenter = (world.height - 80) * random.random() + 30
 
     ## ORDERED CROWD ####
     # Initialisation des particules sur forme de grille
-    # i = 0
-    # j = 1
-    # for k in range(0, len(my_particles)):
-    #     my_particles[k].vx = 0
-    #     my_particles[k].vy = 0
-    #     # my_particles[k].xcenter = 40
-    #     # my_particles[k].ycenter = 40
-    #     if 40 * i <= 420:
-    #         i = i + 1
-    #         my_particles[k].xcenter = 40 * i
-    #         my_particles[k].ycenter = 40 * j
-    #     else:
-    #         i = 1
-    #         j = j + 1
-    #         my_particles[k].xcenter = 40
-    #         my_particles[k].ycenter = 40 * j
+    i = 0
+    j = 1
+    for k in range(0, len(my_particles)):
+        my_particles[k].vx = 0
+        my_particles[k].vy = 0
+        # my_particles[k].xcenter = 40
+        # my_particles[k].ycenter = 40
+        if 40 * i <= 420:
+            i = i + 1
+            my_particles[k].xcenter = 40 * i
+            my_particles[k].ycenter = 40 * j
+        else:
+            i = 1
+            j = j + 1
+            my_particles[k].xcenter = 40
+            my_particles[k].ycenter = 40 * j
 
     return my_particles
 
@@ -280,7 +284,7 @@ def deplacement():
                     print(p[i].vy)
                     p[j].xcenter = p[j].xcenter  # Stays behind the particle closer to the door
                     p[j].ycenter = p[j].ycenter
-                    p[i].color = "Red"
+                    # p[i].color = "Red"
                     # if p[i].distance_collision(p[j]) > 20:
                     #     print("It's finished")
                     #     break
