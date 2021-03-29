@@ -14,8 +14,16 @@ Simulation = Tk()
 Simulation.title("Crowd Simulation")
 width = 500
 height = 500
+
+Frame1 = Frame(Simulation, borderwidth=5, relief=RAISED, height=50, width=50)
+Frame1.pack(padx=10, pady=10)
+
+title=Label(Frame1,text="Welcome to the Crowd Simulator !", fg="black", font="Verdana 15 bold", width=50)
+title.pack(pady=20)
+
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white")
-interface.pack(padx=50, pady=50)
+interface.pack(padx=50, pady=0)
+
 
 ##### Trying to set up the screen of simulation
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
@@ -35,7 +43,7 @@ Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
 examplelabel = Label(Frame2, textvariable=example, width=100)
 resultlabel = Label(Frame2, textvariable=result, width=100)
-chronolabel = Label(Frame2, text="Welcome To Crowd Simulator!", fg="black", font="Verdana 15 bold")
+chronolabel = Label(Frame2, text="TEMPS", fg="black", font="Verdana 15 bold")
 examplelabel.pack()
 resultlabel.pack(padx=10)
 chronolabel.pack()
@@ -80,7 +88,7 @@ def resfresh():
 
 
 # Creation of a Button "Validate":
-Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer)
+Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer,activebackground="RED")
 Bouton_Lancer.pack()  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
@@ -170,7 +178,7 @@ def CreaCrowd(my_particles):
     ## ORDERED CROWD ####
     # Initialisation des particules sur forme de grille
     # i = 0
-    # j = 1
+    # j = 7
     # for k in range(0, len(my_particles)):
     #     my_particles[k].vx = 0
     #     my_particles[k].vy = 0
@@ -252,7 +260,6 @@ def deplacement():
             p[i].vx = -p[i].vx
 
         if interface.coords(b)[0] < 20:
-
             if (world.height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
                 p[i].color = "green"
@@ -260,20 +267,20 @@ def deplacement():
                     part_out.append(p[i])
             else:
                 p[i].vx = -p[i].vx
+
         # le mur
-        if 90 < interface.coords(b)[0] < 105:
+        if 100 < interface.coords(b)[0] < 105:
             if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
-                if p[i].DistanceSortie([100, (world.height / 2 - w_porte)]) < p[i].DistanceSortie(
-                        [100, (world.height / 2 + w_porte)]):
-                    p[i].vx, p[i].vy = [0, +(p[i].vy + p[i].vx)]
+                if p[i].DistanceSortie([100, (world.height / 2 - w_porte)]) > p[i].DistanceSortie([100, (world.height / 2 + w_porte)]):
+                    [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
                     p[i].color = "black"
                 else:
-                    p[i].vx, p[i].vy = [0, -(p[i].vy + p[i].vx)]
-                    p[i].color = "black"
+                    [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
+                    p[i].color = "blue"
 
         ## Was used to compute the old speed
-        # p[i].xcenter = p[i].xcenter + p[i].vx
-        # p[i].ycenter = p[i].ycenter + p[i].vy
+        p[i].xcenter = p[i].xcenter + p[i].vx
+        p[i].ycenter = p[i].ycenter + p[i].vy
 
         # ## Check for collisions between the balls ####
         for j in range(0, len(ListPart)):
