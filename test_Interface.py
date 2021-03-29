@@ -5,6 +5,10 @@ from time import *
 from timeit import default_timer
 from tkinter import *
 from People import *
+import numpy as np
+from matplotlib import pyplot as plt
+
+
 
 ##SETUP
 # On cree une fenetre et un canevas:
@@ -17,13 +21,20 @@ height = 500
 
 Frame1 = Frame(Simulation, borderwidth=5, relief=RAISED, height=50, width=50)
 Frame1.pack(padx=10, pady=10)
-
+# SEB
 title=Label(Frame1,text="Welcome to the Crowd Simulator !", fg="black", font="Verdana 15 bold", width=50)
 title.pack(pady=20)
 
-interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white")
+interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white", cursor="cross")
 interface.pack(padx=50, pady=0)
 
+x = np.arange(1,11)
+y = 2 * x + 5
+plt.title("Matplotlib demo")
+plt.xlabel("x axis caption")
+plt.ylabel("y axis caption")
+plt.plot(x,y)
+plt.show()
 
 ##### Trying to set up the screen of simulation
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
