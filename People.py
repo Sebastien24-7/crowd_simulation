@@ -38,6 +38,7 @@ class People():
             self.xcoord, self.ycoord = [xcenter - 7,
                                         ycenter - 7]  # They are the coordinates of the center of the particle
             self.masse = 0.5
+            self.speed = 0.8
             self.name = "Enfant"
             self.color = "green"
         if type == "adult":
@@ -88,11 +89,6 @@ class People():
                              ((particle.ycenter + particle.radius) - (self.ycenter + self.radius)) ** 2)
         return distance
 
-        # # the ** is the operator for square
-        # distance = math.sqrt(((particle.xcenter + particle.radius) - (self.xcenter + self.radius)) ** 2 +
-        #                      ((particle.ycenter + particle.radius) - (self.ycenter + self.radius)) ** 2)
-        # return distance
-
     def people_target_distance(self):
         """
         Determines the distance for all the particles between them and their targets
@@ -109,7 +105,13 @@ class People():
         self.vy = (coord_sortie[1] - self.ycenter) / math.sqrt(
             (self.xcenter - coord_sortie[0]) ** 2 + (self.ycenter - coord_sortie[1]) ** 2)
 
-    def DistanceSortie(self, coord_sortie):
-        delta_x = coord_sortie[0] - self.xcenter
-        delta_y = coord_sortie[1] - self.ycenter
+    def Distance(self, coord):
+        delta_x = coord[0] - self.xcenter
+        delta_y = coord[1] - self.ycenter
         return math.sqrt(delta_x ** 2 + delta_y ** 2)
+
+    def CollisionObstacle(self, coord):
+
+        delta = math.sqrt(((coord[0]) - (self.xcenter + self.radius)) ** 2 +
+                          ((coord[1]) - (self.ycenter + self.radius)) ** 2)
+        return delta
