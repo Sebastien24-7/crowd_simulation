@@ -29,19 +29,19 @@ fenetre['bg'] = 'white'
 
 # frame 1
 Frame1 = Frame(fenetre, borderwidth=2, relief=GROOVE, height=500, width=500)
-Frame1.pack(side=TOP, padx=100, pady=100)
+Frame1.grid(side=TOP, padx=100, pady=100)
 
 # frame 2
 Frame2 = Frame(Frame1, borderwidth=2, relief=GROOVE, height=50, width=500)
-Frame2.pack(side=BOTTOM, padx=100, pady=100)
+Frame2.grid(side=BOTTOM, padx=100, pady=100)
 
 # Ajout de labels
-Label(Frame1, text="Frame 1").pack(padx=10, pady=10)
-Label(Frame2, text="Frame 2").pack(padx=10, pady=10)
+Label(Frame1, text="Frame 1").grid(padx=10, pady=10)
+Label(Frame2, text="Frame 2").grid(padx=10, pady=10)
 
 example = StringVar()
 examplelabel = Label(Frame2, textvariable=example)
-examplelabel.pack()
+examplelabel.grid()
 
 
 #####
@@ -55,16 +55,16 @@ def recupere():
 value = StringVar()
 value.set("Valeur")
 entree = Entry(Frame1, textvariable=value, width=30)
-entree.pack()
+entree.grid()
 
 bouton = Button(Frame1, text="Valider", command=recupere)
-bouton.pack(padx=10, pady=10)
+bouton.grid(padx=10, pady=10)
 
 s = Spinbox(Frame2, from_=10, to_=100)
-s.pack()
+s.grid()
 
 bouton2 = Button(Frame2, text="Valider", command=recupere)
-bouton2.pack(padx=10, pady=10)
+bouton2.grid(padx=10, pady=10)
 
 fenetre.config(menu=menubar)
 fenetre.mainloop()

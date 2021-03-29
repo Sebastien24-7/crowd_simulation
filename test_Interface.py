@@ -9,55 +9,55 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
 ##SETUP
 # On cree une fenetre et un canevas:
 from environment import *
 
 Simulation = Tk()
 Simulation.title("Crowd Simulation")
+Simulation.geometry("750x700")
 width = 500
 height = 500
 
 Frame1 = Frame(Simulation, borderwidth=5, relief=RAISED, height=50, width=50)
-Frame1.pack(padx=10, pady=10)
+Frame1.grid(row=0, column=1)
 # SEB
-title=Label(Frame1,text="Welcome to the Crowd Simulator !", fg="black", font="Verdana 15 bold", width=50)
-title.pack(pady=20)
+title = Label(Frame1, text="Welcome to the Crowd Simulator !", fg="black", font="Verdana 15 bold", width=35)
+title.grid()
 
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white", cursor="cross")
-interface.pack(padx=50, pady=0)
+interface.grid(row=1, column=1)
 
-x = np.arange(1,11)
+x = np.arange(1, 11)
 y = 2 * x + 5
 plt.title("Matplotlib demo")
 plt.xlabel("x axis caption")
 plt.ylabel("y axis caption")
-plt.plot(x,y)
+plt.plot(x, y)
 plt.show()
 
 ##### Trying to set up the screen of simulation
-Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=200)
-Frame2.pack(side=TOP, padx=10, pady=10)
-
-sp = Spinbox(Frame2, from_=0, to_=100, width=10)
-sp.pack()
+Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=100)
+Frame2.grid(row=2, column=1)
 
 ##Variables attached to Simulation
 example = StringVar(Frame2, name="example")
-example.set('Choisis le Nombre de Particules')
+example.set('Choisis le Nombre de Particules :')
 result = StringVar(Frame2, name="result")
 result.set('Nombre de Particules sorties :')
 
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
 Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
-examplelabel = Label(Frame2, textvariable=example, width=100)
-resultlabel = Label(Frame2, textvariable=result, width=100)
+examplelabel = Label(Frame2, textvariable=example, width=52)
+resultlabel = Label(Frame2, textvariable=result)
 chronolabel = Label(Frame2, text="TEMPS", fg="black", font="Verdana 15 bold")
-examplelabel.pack()
-resultlabel.pack(padx=10)
-chronolabel.pack()
+examplelabel.grid(row=2, column=1)
+resultlabel.grid(row=3, column=1)
+chronolabel.grid(row=1, column=1)
+
+sp = Spinbox(Frame2, from_=0, to_=100, width=10)
+sp.grid(row=2, column=2)
 
 ### VARIABLES
 w_porte = 30
@@ -83,11 +83,19 @@ def lancer():
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
     particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))
     ListPart = CreaCrowd(particles)
-    chilling()
-    # Get the real value of the number of particles
-    if (int)(sp.get()) != 0:
-        start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
-        deplacement()
+    chilling()  # Particles move in every direction
+
+    # # Get the real value of the number of particles
+    # if (int)(sp.get()) != 0:
+    #     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
+    #     deplacement()
+
+
+def evacuate():
+    ## Create an alert and makes everyone move towards the exit
+    global start
+    start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
+    deplacement()
 
 
 def resfresh():
@@ -98,13 +106,17 @@ def resfresh():
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
 
-# Creation of a Button "Validate":
-Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer,activebackground="RED")
-Bouton_Lancer.pack()  # We add the button to the display of interface tk
+# Creation of a Button "Launch":
+Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer, activebackground="RED")
+Bouton_Lancer.grid(row=4, column=0)  # We add the button to the display of interface tk
+
+# Creation of a Button "Evacuate":
+Bouton_Lancer = Button(Frame2, text='Evacuer', command=evacuate, activebackground="RED")
+Bouton_Lancer.grid(row=4, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
-Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=resfresh)
-Bouton_Refresh.pack(padx=50)  # We add the button to the display of interface tk
+Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=resfresh, activebackground="RED")
+Bouton_Refresh.grid(row=4, column=2)  # We add the button to the display of interface tk
 
 
 ###########
@@ -151,9 +163,9 @@ def CreaPart(number):
         # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
         # print(D)
 
-        vx = 10 * (coord_sortie[0] - xcenter) / math.sqrt(
+        vx = 1 * (coord_sortie[0] - xcenter) / math.sqrt(
             (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
-        vy = 10 * (coord_sortie[1] - ycenter) / math.sqrt(
+        vy = 1 * (coord_sortie[1] - ycenter) / math.sqrt(
             (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
 
         # vx = random.random() * 10
@@ -226,12 +238,12 @@ def ComputeTraject(my_particles):
 def CreateEnv():
     # Create the room
     interface.create_rectangle(20, 20, world.width - 20, world.height - 20, outline="red", width=5)
-    interface.pack()
+    interface.grid()
     # Create the door
     interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.create_line(100, (world.height / 2 - w_porte), 100, (world.height / 2 + w_porte), fill="black", width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
-    interface.pack()
+    interface.grid()
 
     # obs = Obstacle()
     # obs.add_shape(Rectangle,outline_color=[0,0,0],fill_color=[255,255,255])
@@ -251,7 +263,7 @@ def deplacement():
 
         b = interface.create_oval((p[i].xcenter - p[i].radius), (p[i].ycenter - p[i].radius),
                                   (p[i].xcenter + p[i].radius), (p[i].ycenter + p[i].radius), fill=p[i].color)
-        interface.pack()
+        interface.grid()
 
         p[i].ComputeTraj([0, world.height / 2])
 
@@ -417,7 +429,7 @@ def chilling():
 
         b = interface.create_oval((p[i].xcenter - p[i].radius), (p[i].ycenter - p[i].radius),
                                   (p[i].xcenter + p[i].radius), (p[i].ycenter + p[i].radius), fill=p[i].color)
-        interface.pack()
+        interface.grid()
 
         # p[i].ComputeTraj([0, world.height / 2])
 
