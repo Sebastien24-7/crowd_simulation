@@ -8,7 +8,6 @@ from People import *
 import numpy as np
 from matplotlib import pyplot as plt
 
-
 ##SETUP
 # On cree une fenetre et un canevas:
 from environment import *
@@ -28,13 +27,13 @@ title.grid()
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white", cursor="cross")
 interface.grid(row=1, column=1)
 
-x = np.arange(1, 11)
-y = 2 * x + 5
-plt.title("Matplotlib demo")
-plt.xlabel("x axis caption")
-plt.ylabel("y axis caption")
-plt.plot(x, y)
-plt.show()
+# x = np.arange(1, 11)
+# y = 2 * x + 5
+# plt.title("Matplotlib demo")
+# plt.xlabel("x axis caption")
+# plt.ylabel("y axis caption")
+# plt.plot(x, y)
+# plt.show()
 
 ##### Trying to set up the screen of simulation
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=100)
@@ -42,9 +41,13 @@ Frame2.grid(row=2, column=1)
 
 ##Variables attached to Simulation
 example = StringVar(Frame2, name="example")
-example.set('Choisis le Nombre de Particules :')
+example.set('Choisissez le Nombre de Particules :')
 result = StringVar(Frame2, name="result")
 result.set('Nombre de Particules sorties :')
+
+crowd_selec = StringVar(Frame2, name="crowd_selec")
+crowd_selec.set('Choisissez le type de Population :')
+crowd_type = StringVar(Frame2, name="crowd_type", value="1")  # Value =1 enables to unchecked the radiobutton
 
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
 Nbr_part_out = IntVar(interface, name="Nbr_part_out")
@@ -74,7 +77,6 @@ str_time = ""
 # Function to display some data
 def lancer():
     ##To get the value
-    global launch
     global ListPart
     global start
 
@@ -82,6 +84,7 @@ def lancer():
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
     particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))
+
     ListPart = CreaCrowd(particles)
     chilling()  # Particles move in every direction
 
@@ -106,17 +109,29 @@ def resfresh():
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
 
+def select():
+    print(crowd_type.get())
+
+
+##Creation of RadioButton to select how to study the room evacuation :
+crowdlabel = Label(Frame2, textvariable=crowd_selec)
+R1 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
+R2 = Radiobutton(Frame2, text="Population Aléatoire", variable=crowd_type, value="Aléatoire", command=select)
+crowdlabel.grid(row=4, column=0)
+R1.grid(row=4, column=1, padx=(10, 0))
+R2.grid(row=4, column=2)
+
 # Creation of a Button "Launch":
 Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer, activebackground="RED")
-Bouton_Lancer.grid(row=4, column=0)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=5, column=0)  # We add the button to the display of interface tk
 
 # Creation of a Button "Evacuate":
 Bouton_Lancer = Button(Frame2, text='Evacuer', command=evacuate, activebackground="RED")
-Bouton_Lancer.grid(row=4, column=1)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=5, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
 Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=resfresh, activebackground="RED")
-Bouton_Refresh.grid(row=4, column=2)  # We add the button to the display of interface tk
+Bouton_Refresh.grid(row=5, column=2)  # We add the button to the display of interface tk
 
 
 ###########
@@ -184,38 +199,41 @@ def CreaPart(number):
 ##Deal with the overlapping at the creation of the particles
 def CreaCrowd(my_particles):
     ### RANDOM CROWD ####
+    if (str)(interface.getvar(name="crowd_type")) == "Aléatoire":
+        for i in range(0, len(my_particles)):
+            # # Check it is inside the room (but not functional)
+            # if (25 +my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (width - 50-my_particles[i].radius):
+            #     my_particles[i].xcenter = (width - 80) * random.random() + 30
+            # if (25 +my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (height - 50-my_particles[i].radius):
+            #     my_particles[i].ycenter = (height - 80) * random.random() + 30
 
-    for i in range(0, len(my_particles)):
-        # # Check it is inside the room (but not functional)
-        # if (25 +my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (width - 50-my_particles[i].radius):
-        #     my_particles[i].xcenter = (width - 80) * random.random() + 30
-        # if (25 +my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (height - 50-my_particles[i].radius):
-        #     my_particles[i].ycenter = (height - 80) * random.random() + 30
-
-        # Checking the overlapping between particles
-        for j in range(0, len(my_particles)):
-            if my_particles[i].distance_collision(my_particles[j]) < (my_particles[i].radius + my_particles[j].radius):
-                my_particles[i].xcenter = (world.width - 80) * random.random() + 30
-                my_particles[i].ycenter = (world.height - 80) * random.random() + 30
+            # Checking the overlapping between particles
+            for j in range(0, len(my_particles)):
+                if my_particles[i].distance_collision(my_particles[j]) < (
+                        my_particles[i].radius + my_particles[j].radius):
+                    my_particles[i].xcenter = (world.width - 80) * random.random() + 30
+                    my_particles[i].ycenter = (world.height - 80) * random.random() + 30
 
     ## ORDERED CROWD ####
-    # Initialisation des particules sur forme de grille
-    # i = 0
-    # j = 7
-    # for k in range(0, len(my_particles)):
-    #     my_particles[k].vx = 0
-    #     my_particles[k].vy = 0
-    #     # my_particles[k].xcenter = 40
-    #     # my_particles[k].ycenter = 40
-    #     if 40 * i <= 420:
-    #         i = i + 1
-    #         my_particles[k].xcenter = 40 * i
-    #         my_particles[k].ycenter = 40 * j
-    #     else:
-    #         i = 1
-    #         j = j + 1
-    #         my_particles[k].xcenter = 40
-    #         my_particles[k].ycenter = 40 * j
+    if (str)(interface.getvar(name="crowd_type")) == "Homogène":
+
+        # Initialisation des particules sur forme de grille
+        i = 0
+        j = 4
+        for k in range(0, len(my_particles)):
+            # my_particles[k].vx = 0
+            # my_particles[k].vy = 0
+            # my_particles[k].xcenter = 40
+            # my_particles[k].ycenter = 40
+            if 40 * i <= 420:
+                i = i + 1
+                my_particles[k].xcenter = 40 * i
+                my_particles[k].ycenter = 40 * j
+            else:
+                i = 1
+                j = j + 1
+                my_particles[k].xcenter = 40
+                my_particles[k].ycenter = 40 * j
 
     return my_particles
 
@@ -294,7 +312,8 @@ def deplacement():
         # le mur
         if 100 < interface.coords(b)[0] < 105:
             if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
-                if p[i].DistanceSortie([100, (world.height / 2 - w_porte)]) > p[i].DistanceSortie([100, (world.height / 2 + w_porte)]):
+                if p[i].DistanceSortie([100, (world.height / 2 - w_porte)]) > p[i].DistanceSortie(
+                        [100, (world.height / 2 + w_porte)]):
                     [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
                     p[i].color = "black"
                 else:
@@ -310,7 +329,7 @@ def deplacement():
             # Check for collision
             if (p[i].distance_collision(p[j]) <= 20):
                 if (p[i].DistanceSortie([0, world.height / 2]) <= p[j].DistanceSortie([0, world.height / 2])):
-                    if p[i].xcoord<0:
+                    if p[i].xcoord < 0:
                         break
                     p[i].xcenter = p[i].xcenter + p[i].vx
                     p[i].ycenter = p[i].ycenter + p[i].vy
