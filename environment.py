@@ -1,10 +1,11 @@
+import math
+
 from numpy import *
 import scipy as sp
 import sys
 import random
 import matplotlib
 import matplotlib.pyplot as plt
-
 
 from matplotlib.patches import Ellipse, Circle, Rectangle, Polygon
 from matplotlib.lines import Line2D
@@ -100,6 +101,14 @@ class Room():
         self.width, self.height = [width, height]
         self.xmax = self.xmin + self.width * pixel_size
         self.ymax = self.ymin + self.height * pixel_size
+        self.ListObstacles = []
+
+        obs = Obstacle("Mur", "Black", "Rectangle", 150, 100)
+        obs1 = Obstacle("Pilier1", "Black", "Circle", 200, 150)
+        obs2 = Obstacle("Pilier2", "Black", "Circle", 150, 300)
+        self.ListObstacles.append(obs)
+        self.ListObstacles.append(obs1)
+        self.ListObstacles.append(obs2)
 
     def __str__(self):
         """
@@ -116,6 +125,7 @@ class Room():
                + "\n    height: " + str(self.height) \
  \
  \
+
 ###############################
 
 class Obstacle():
@@ -128,23 +138,22 @@ class Obstacle():
     Attributes :
 
     """
+    ListObstacles = []
 
-    def __init__(self, name='Goal', background='Black', pixel_size=1.0,
-                 xcoord=0.0, width=50,
-                 ycoord=0.0, height=50):
+    def __init__(self, name, background, form,
+                 xcenter, ycenter):
         """
         Constructor of an Obstacle object
         """
-        self.__shapes = []
-        self.__outline_color_shapes = []
-        self.__fill_color_shapes = []
-        self.__image_filename = ''
+        self.shape = form
         self.name = name
-        self.__background = background
+        self.color = background
         self.destinations = None
-        self.pixel_size = pixel_size
-        self.xcoord, self.ycoord = [xcoord, ycoord]
-        self.width, self.height = [width, height]
+        self.pixel_size = 1.0
+        self.xcenter, self.ycenter = [xcenter, ycenter]
+        self.xcoord, self.ycoord = [xcenter - 10, ycenter - 10]
+        self.radius = math.sqrt(math.pow(self.xcenter - self.xcoord, 2) + math.pow(self.ycenter - self.ycoord, 2))
+        self.height, self.width = [10, 10]
 
     pass
 
@@ -154,15 +163,15 @@ class Obstacle():
         """
         return "--> Je suis un objet Obstacle " \
                + "\n    name: " + str(self.name) \
-               + "\n    background: " + str(self.__background) \
-               + "\n    xcoord: " + str(self.xcoord) \
-               + "\n    ycoord: " + str(self.ycoord) \
-               + "\n    width: " + str(self.width) \
-               + "\n    height: " + str(self.height) \
- \
-            ############
+               + "\n    color: " + str(self.color) \
+               + "\n    xcenter: " + str(self.xcenter) \
+               + "\n    ycenter: " + str(self.ycenter) \
+            # + "\n    width: " + str(self.width) \
+        # + "\n    height: " + str(self.height) \
 
-    def add_shape(self, shape, outline_color=[0, 0, 0], fill_color=[255, 255, 255]):
+    ############
+
+    def add_shape(self):
         """To add a matplotlib shape:
         ``line2D``, ``circle``, ``ellipse``, ``rectangle`` or ``polygon``
         Parameters
@@ -174,35 +183,57 @@ class Obstacle():
         fill_color: list
             rgb color
         """
-        self.__shapes.append(shape)
-        self.__outline_color_shapes.append(outline_color)
-        self.__fill_color_shapes.append(fill_color)
-        self.image = Image.open(self.__background)
-        self.draw = ImageDraw.Draw(self.image)
+        global ListObstacles
+        ListObstacles.append(self)
+        xy = []
 
-        if (isinstance(shape, Circle) or isinstance(shape, Ellipse) or
-                isinstance(shape, Rectangle) or isinstance(shape, Polygon)):
+        if (isinstance(self.shape, Circle)):
+            xy = self.shape.get_verts() / self.pixel_size
+            xy[:, 1] = self.height - xy[:, 1]
+            self.draw.circle(sp.around(xy.flatten()).tolist())
+
+        elif (isinstance(self.shape, Rectangle)):
+            xy = self.shape.get_verts() / self.pixel_size
+            xy[:, 1] = self.height - xy[:, 1]
+            self.draw.rectangle(sp.around(xy.flatten()).tolist())
+
+        elif (isinstance(self.shape, Polygon)):
             xy = shape.get_verts() / self.pixel_size
             xy[:, 1] = self.height - xy[:, 1]
-            self.draw.polygon(sp.around(xy.flatten()).tolist(),
-                              outline="rgb(" + str(outline_color[0]) + "," +
-                                      str(outline_color[1]) + "," +
-                                      str(outline_color[2]) + ")",
-                              fill="rgb(" + str(fill_color[0]) + "," +
-                                   str(fill_color[1]) + "," +
-                                   str(fill_color[2]) + ")")
-            linewidth = shape.get_linewidth()
-            self.draw.line(sp.around(xy.flatten()).tolist(),
-                           width=int(linewidth),
-                           fill="rgb(" + str(outline_color[0]) + "," +
-                                str(outline_color[1]) + "," +
-                                str(outline_color[2]) + ")")
-        elif isinstance(shape, Line2D):
+            self.draw.polygon(sp.around(xy.flatten()).tolist())
+
+        elif (isinstance(self.shape, Line2D)):
             linewidth = shape.get_linewidth()
             xy = shape.get_xydata() / self.pixel_size
             xy[:, 1] = self.height - xy[:, 1]
-            self.draw.line(sp.around(xy.flatten()).tolist(),
-                           width=int(linewidth),
-                           fill="rgb(" + str(outline_color[0]) + "," +
-                                str(outline_color[1]) + "," +
-                                str(outline_color[2]) + ")")
+            self.draw.line(sp.around(xy.flatten()).tolist(), width=int(linewidth))
+
+        # if (isinstance(shape, Circle) or isinstance(shape, Ellipse) or
+        #         isinstance(shape, Rectangle) or isinstance(shape, Polygon)):
+        #     xy = shape.get_verts() / self.pixel_size
+        #     xy[:, 1] = self.height - xy[:, 1]
+        #     self.draw.polygon(sp.around(xy.flatten()).tolist(),
+        #                       outline="rgb(" + str(outline_color[0]) + "," +
+        #                               str(outline_color[1]) + "," +
+        #                               str(outline_color[2]) + ")",
+        #                       fill="rgb(" + str(fill_color[0]) + "," +
+        #                            str(fill_color[1]) + "," +
+        #                            str(fill_color[2]) + ")")
+        #     linewidth = shape.get_linewidth()
+        #     self.draw.line(sp.around(xy.flatten()).tolist(),
+        #                    width=int(linewidth),
+        #                    fill="rgb(" + str(outline_color[0]) + "," +
+        #                         str(outline_color[1]) + "," +
+        #                         str(outline_color[2]) + ")")
+        # elif isinstance(shape, Line2D):
+        #     linewidth = shape.get_linewidth()
+        #     xy = shape.get_xydata() / self.pixel_size
+        #     xy[:, 1] = self.height - xy[:, 1]
+        #     self.draw.line(sp.around(xy.flatten()).tolist(),
+        #                    width=int(linewidth),
+        #                    fill="rgb(" + str(outline_color[0]) + "," +
+        #                         str(outline_color[1]) + "," +
+        #                         str(outline_color[2]) + ")")
+
+    def __getListObstacles__(self):
+        return ListObstacles

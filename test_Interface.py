@@ -5,12 +5,12 @@ from time import *
 from timeit import default_timer
 from tkinter import *
 from People import *
+from environment import *
 import numpy as np
 from matplotlib import pyplot as plt
 
 ##SETUP
 # On cree une fenetre et un canevas:
-from environment import *
 
 Simulation = Tk()
 Simulation.title("Crowd Simulation")
@@ -67,7 +67,9 @@ w_porte = 30
 part_out = []
 ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
+ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
+start = 0.0
 str_time = ""
 
 
@@ -78,7 +80,6 @@ str_time = ""
 def lancer():
     ##To get the value
     global ListPart
-    global start
 
     interface.setvar(name="Nbr_particles", value=sp.get())
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
@@ -93,13 +94,11 @@ def lancer():
     #     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
     #     deplacement()
 
-
 def evacuate():
     ## Create an alert and makes everyone move towards the exit
     global start
     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
     deplacement()
-
 
 def resfresh():
     ## To update the screen of display
@@ -107,7 +106,6 @@ def resfresh():
     result.set("Nombre d'individus sorties :" + (str)(
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
-
 
 def select():
     print(crowd_type.get())
@@ -265,8 +263,20 @@ def CreateEnv():
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
-    # obs = Obstacle()
-    # obs.add_shape(Rectangle,outline_color=[0,0,0],fill_color=[255,255,255])
+    ## Add obstacles to the room (they are created in the class Room)
+    for i in range(len(ListObstacles)):
+        print(ListObstacles[i])
+        if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
+            interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
+                                       (ListObstacles[i].ycenter - ListObstacles[i].radius),
+                                       (ListObstacles[i].xcenter + ListObstacles[i].radius),
+                                       (ListObstacles[i].ycenter + ListObstacles[i].radius),
+                                       fill=ListObstacles[i].color)
+        elif ListObstacles[i].shape == "Circle":
+            interface.create_oval((ListObstacles[i].xcenter - ListObstacles[i].radius),
+                                  (ListObstacles[i].ycenter - ListObstacles[i].radius),
+                                  (ListObstacles[i].xcenter + ListObstacles[i].radius),
+                                  (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
 
 
 # Creation of the Movement
@@ -423,10 +433,11 @@ def chilling():
             # else:
             p[i].vx = -p[i].vx
 
-        # le mur
-        if p[i].CollisionObstacle([100, world.height / 2]) < p[i].radius + 5:
-            if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
-                p[i].vx, p[i].vy = [-p[i].vx, p[i].vy]
+        ## Not Useful anymore :
+        # # le mur
+        # if p[i].CollisionObstacle([100, world.height / 2]) < p[i].radius + 5:
+        #     if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
+        #         p[i].vx, p[i].vy = [-p[i].vx, p[i].vy]
 
         ## Was used to compute the old speed
         p[i].xcenter = p[i].xcenter + p[i].vx
@@ -438,6 +449,21 @@ def chilling():
 def collision(p):
     ### Check for collisions between the balls ####
     for i in range(0, len(p)):
+
+        # le mur
+        if 100 < (p[i].xcenter - p[i].radius) < 105:
+            if (world.height / 2 - w_porte) - 20 < (p[i].ycenter - p[i].radius) < (world.height / 2 + w_porte):
+                if p[i].Distance([100, (world.height / 2 - w_porte)]) > p[i].Distance(
+                        [100, (world.height / 2 + w_porte)]):
+                    [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
+                    p[i].color = "black"
+                else:
+                    [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
+                    p[i].color = "blue"
+
+        # collision with all obstacles
+        p[i].CollisionObstacle2(ListObstacles)
+
         for j in range(i + 1, len(ListPart)):
             # Check for collision
             if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
