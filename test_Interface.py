@@ -66,7 +66,8 @@ sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
 ### VARIABLES
-w_porte = 30
+w_porte = 200
+w_obstacle = 30
 part_out = []
 ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
@@ -144,7 +145,8 @@ def refresh():
     #         X[i] = part_out[i].time
     # print(X,Y)
     for i in range (0,len(part_out)):
-        X[i] = part_out[i].time
+        # X[i] = part_out[i].time
+        X[i] = i
         Y[i] = i
     fig1.add_subplot(111).plot(X, Y)
     canvas = FigureCanvasTkAgg(fig1, master=Simulation)  # A tk.DrawingArea.
@@ -331,8 +333,8 @@ def CreateEnv():
     interface.create_rectangle(20, 20, world.width - 20, world.height - 20, outline="red", width=5)
     interface.grid()
     # Create the door
-    interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
-    interface.create_line(100, (world.height / 2 - w_porte), 100, (world.height / 2 + w_porte), fill="black", width=5)
+    interface.create_line(20, ((world.height- w_porte) / 2 ), 20, ((world.height+ w_porte) / 2 ), fill="green", width=5)
+    interface.create_line(100, (world.height / 2 - w_obstacle), 100, (world.height / 2 + w_obstacle), fill="black", width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
@@ -405,9 +407,9 @@ def deplacement():
 
         # le mur
         if 100 < interface.coords(b)[0] < 105:
-            if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
-                if p[i].Distance([100, (world.height / 2 - w_porte)]) > p[i].Distance(
-                        [100, (world.height / 2 + w_porte)]):
+            if (world.height / 2 - w_obstacle) - 20 < interface.coords(b)[1] < (world.height / 2 + w_obstacle):
+                if p[i].Distance([100, (world.height / 2 - w_obstacle)]) > p[i].Distance(
+                        [100, (world.height / 2 + w_obstacle)]):
                     [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
                     p[i].color = "black"
                 else:
@@ -448,7 +450,7 @@ def deplacement():
         print("Everyone is out of the room")
         print("And all of them get out in " + (str)(str_time) + "seconds")
         refresh()
-        # exit()
+        exit()
 
 
 def suppr():
