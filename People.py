@@ -77,6 +77,7 @@ class People():
                + "\n    ycoord: " + str(self.ycoord) \
                + "\n    touched: " + str(self.touched) \
                + "\n    mon rayon : " + str(self.radius) \
+               + "\n    je suis sortie en :" + str(self.time) \
  \
             ############
 
@@ -135,10 +136,10 @@ class People():
                                   ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
                         [ListObstacles[i].xcenter + ListObstacles[i].radius,
                          ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                    [self.vx, self.vy] = [0, +(self.vy + self.vx)]
                     self.color = "black"
                 else:
-                    [self.vx, self.vy] = [0, +(self.vy + self.vx)]
+                    [self.vx, self.vy] = [0, -(self.vy + self.vx)]
                     self.color = "black"
 
                 # Left of the Obstacle
@@ -153,21 +154,21 @@ class People():
                     self.color = "black"
 
                 ##Top of the obstacle
-                if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
+                if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
                                   ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                        [ListObstacles[i].ycenter + ListObstacles[i].radius,
-                         ListObstacles[i].xcenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [-(self.vy + self.vx), 0]
+                    [ListObstacles[i].ycenter - ListObstacles[i].radius,
+                     ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                    [self.vx, self.vy] = [+(self.vy + self.vx), 0]
                     self.color = "blue"
                 else:
-                    [self.vx, self.vy] = [+(self.vy + self.vx), 0]
+                    [self.vx, self.vy] = [-(self.vy + self.vx), 0]
                     self.color = "blue"
 
                 ##Bottom of the obstacle
-                if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
+                if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
                                   ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                        [ListObstacles[i].ycenter - ListObstacles[i].radius,
-                         ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                    [ListObstacles[i].ycenter + ListObstacles[i].radius,
+                     ListObstacles[i].xcenter + ListObstacles[i].radius]):
                     [self.vx, self.vy] = [+(self.vy + self.vx), 0]
                     self.color = "blue"
                 else:

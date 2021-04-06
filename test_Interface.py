@@ -104,17 +104,32 @@ def evacuate():
     deplacement()
 
 
-def resfresh():
+def refresh():
     ## To update the screen of display
     interface.setvar(name="Nbr_part_out", value=len(part_out))
     result.set("Nombre d'individus sorties :" + (str)(
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
+    fig = Figure()
+    Y = []
+    X = []
+    for i in range(len(part_out)):
+
+        if i != 0 and part_out[i].time == part_out[i - 1].time:
+            Y[i - 1] += 1
+        else:
+            Y[i] += 1
+            X[i] = part_out[i].time
+    fig.add_subplot(111).plot(X, Y)
+    canvas = FigureCanvasTkAgg(fig, master=Simulation)  # A tk.DrawingArea.
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=1, column=2)
+
 
 def graph():
     fig = Figure()
-    ListPart
+    global ListPart
     l=0
     k=0
     j=0
@@ -154,7 +169,7 @@ Bouton_Lancer = Button(Frame2, text='Evacuer', command=evacuate, activebackgroun
 Bouton_Lancer.grid(row=5, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
-Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=resfresh, activebackground="RED")
+Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=refresh, activebackground="RED")
 Bouton_Refresh.grid(row=5, column=2)  # We add the button to the display of interface tk
 
 Bouton_Graph = Button(Frame2, text='Graphique', command=graph, activebackground="RED")
@@ -209,8 +224,8 @@ def CreaPart(number):
         # vy = 1 * (coord_sortie[1] - ycenter) / math.sqrt(
         #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
 
-        vx = random.random() * 5 - 1
-        vy = random.random() * 5 - 1
+        vx = random.random() * 2 - 1
+        vy = random.random() * 2 - 1
         # vx, vy = [0, 0]
 
         k = random.randrange(len(possible_types))
@@ -218,7 +233,7 @@ def CreaPart(number):
         type = possible_types[k]
 
         p = People(xcenter, ycenter, vx, vy, type)
-        print(p)
+        # print(p)
         my_particles.append(p)
     return my_particles
 
@@ -347,8 +362,12 @@ def deplacement():
             if (world.height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
                 p[i].color = "green"
+                p[i].time = str_time
+                print(p[i].name + "sorti en :" + p[i].time)
+
                 if p[i] not in part_out:
                     part_out.append(p[i])
+
             else:
                 p[i].vx = -p[i].vx
 
@@ -376,8 +395,7 @@ def deplacement():
                     p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
                     p[j].ycoord = p[j].ycoord
                     p[i].color = "Red"
-                    if p[i].distance_collision(p[j]) > 20:
-                        print("It's finished")
+                    if p[i].distance_collision(p[j]) > 20:  # To stop computing when they're afar
                         break
                 else:
                     if p[i].xcenter < 0:
