@@ -38,19 +38,21 @@ class People():
             self.xcoord, self.ycoord = [xcenter - 7,
                                         ycenter - 7]  # They are the coordinates of the center of the particle
             self.masse = 0.5
-            self.speed = 0.8
+            self.speed = 2
             self.name = "Enfant"
             self.color = "green"
         if type == "adult":
             self.xcoord, self.ycoord = [xcenter - 8,
                                         ycenter - 8]  # They are the coordinates of the center of the particle
             self.masse = 1
+            self.speed = 1
             self.name = "Adulte"
             self.color = "purple"
         if type == "old":
             self.xcoord, self.ycoord = [xcenter - 9,
                                         ycenter - 9]  # They are the coordinates of the center of the particle
             self.masse = 1.5
+            self.speed = 0.7
             self.name = "Ancien"
             self.color = "yellow"
         ####
@@ -60,7 +62,7 @@ class People():
         self.touched = 0
         self.masse = 1
         self.angle = 0
-        self.vx, self.vy = (vx, vy)
+        self.vx, self.vy = (self.speed*vx, self.speed*vy)
         self.good_pos = False
         self.time = 0
 

@@ -34,7 +34,7 @@ title.grid()
 interface = Canvas(Simulation, width=width, height=height, bd=0, bg="white", cursor="cross")
 interface.grid(row=1, column=1)
 
-interface2 = Canvas(Simulation, width=width, height=height, bd=0, bg="white", cursor="cross")
+interface2 = Canvas(Simulation, width=width/2, height=height/2, bd=0, bg="white", cursor="cross")
 interface2.grid(row=1, column=2)
 
 
@@ -73,10 +73,31 @@ world = Room()  # The aim is to use it for everything linked to the creation of 
 ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
 start = 0.0
-str_time = ""
+str_time = ''
 
 #####TRASH##############
 # Not Useful anymore
+
+def graph():
+    fig = Figure()
+    ListPart
+    l=0
+    k=0
+    j=0
+    for i in range (0,len(ListPart)):
+        if ListPart[i].name == "Enfant":
+            k=k+1
+        if ListPart[i].name == "Adulte":
+            j=j+1
+        if ListPart[i].name == "Ancien":
+            l=l+1
+    print(k)
+    t = ("Enfant","Adulte","Ancien")
+    Y=(k,j,l)
+    fig.add_subplot(111).plot(t, Y)
+    canvas = FigureCanvasTkAgg(fig, master=Simulation)  # A tk.DrawingArea.
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=1,column=2)
 
 # Function to display some data
 def lancer():
@@ -90,7 +111,7 @@ def lancer():
 
     ListPart = CreaCrowd(particles)
     chilling()  # Particles move in every direction
-
+    graph()
     # # Get the real value of the number of particles
     # if (int)(sp.get()) != 0:
     #     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
@@ -111,25 +132,29 @@ def refresh():
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
-    fig = Figure()
+    part_out
+    fig1 = Figure()
     Y = []
     X = []
-    for i in range(len(part_out)):
-
-        if i != 0 and part_out[i].time == part_out[i - 1].time:
-            Y[i - 1] += 1
-        else:
-            Y[i] += 1
-            X[i] = part_out[i].time
-    fig.add_subplot(111).plot(X, Y)
-    canvas = FigureCanvasTkAgg(fig, master=Simulation)  # A tk.DrawingArea.
+    # for i in range(0,len(part_out)):
+    #     if i != 0 and part_out[i].time == part_out[i - 1].time:
+    #         Y[i - 1] += 1
+    #     else:
+    #         Y[i] += 1
+    #         X[i] = part_out[i].time
+    # print(X,Y)
+    for i in range (0,len(part_out)):
+        X[i] = part_out[i].time
+        Y[i] = i
+    fig1.add_subplot(111).plot(X, Y)
+    canvas = FigureCanvasTkAgg(fig1, master=Simulation)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().grid(row=1, column=2)
 
 
 def graph():
     fig = Figure()
-    global ListPart
+    ListPart
     l=0
     k=0
     j=0
@@ -140,7 +165,7 @@ def graph():
             j=j+1
         if ListPart[i].name == "Ancien":
             l=l+1
-    print(k)
+    # print(k)
     t = ("Enfant","Adulte","Ancien")
     Y=(k,j,l)
     fig.add_subplot(111).plot(t, Y)
@@ -182,7 +207,7 @@ def updateTime():
     now = default_timer() - start
     minutes, seconds = divmod(now, 60)
     hours, minutes = divmod(minutes, 60)
-    str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    str_time = '%d:%02d:%02d' % (hours, minutes, seconds)
     chronolabel['text'] = str_time
     chronolabel.after(1000, updateTime)
 
@@ -228,12 +253,16 @@ def CreaPart(number):
         vy = random.random() * 2 - 1
         # vx, vy = [0, 0]
 
-        k = random.randrange(len(possible_types))
-
-        type = possible_types[k]
+        k = random.random()
+        if k<0.6:
+            type = possible_types[1]
+        if 0.6<k<0.8:
+            type = possible_types[0]
+        if 0.8<k<1.0:
+            type = possible_types[2]
 
         p = People(xcenter, ycenter, vx, vy, type)
-        # print(p)
+
         my_particles.append(p)
     return my_particles
 
@@ -290,9 +319,9 @@ def ComputeTraject(my_particles):
         # print(D)
 
         # Give the adapted speed to each particle
-        my_particles[i].vx = 10 * (coord_sortie[0] - my_particles[i].xcenter) / math.sqrt(
+        my_particles[i].vx = my_particles[i].speed * (coord_sortie[0] - my_particles[i].xcenter) / math.sqrt(
             (my_particles[i].xcenter - coord_sortie[0]) ** 2 + (my_particles[i].ycenter - coord_sortie[1]) ** 2)
-        my_particles[i].vy = 10 * (coord_sortie[1] - my_particles[i].ycenter) / math.sqrt(
+        my_particles[i].vy = my_particles[i].speed * (coord_sortie[1] - my_particles[i].ycenter) / math.sqrt(
             (my_particles[i].xcenter - coord_sortie[0]) ** 2 + (my_particles[i].ycenter - coord_sortie[1]) ** 2)
 
 
@@ -303,7 +332,7 @@ def CreateEnv():
     interface.grid()
     # Create the door
     interface.create_line(20, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
-    interface.create_line(100, (world.height / 2 - w_porte), 100, (world.height / 2 + w_porte), fill="black", width=4)
+    interface.create_line(100, (world.height / 2 - w_porte), 100, (world.height / 2 + w_porte), fill="black", width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
@@ -341,7 +370,10 @@ def deplacement():
                                   (p[i].xcenter + p[i].radius), (p[i].ycenter + p[i].radius), fill=p[i].color)
         interface.grid()
 
-        p[i].ComputeTraj([0, world.height / 2])
+        if (p[i].Distance([0, (world.height-w_porte) / 2])) < p[i].Distance([0, (world.height+w_porte)/2]):
+            p[i].ComputeTraj([0, (world.height-w_porte) / 2])
+        else:
+            p[i].ComputeTraj([0, (world.height+w_porte)/2])
 
         # Check for bouncing on the walls or going through the door
 
@@ -362,8 +394,8 @@ def deplacement():
             if (world.height / 2 - w_porte) < interface.coords(b)[1] < (world.height / 2 + w_porte) - 20:
                 p[i].vx, p[i].vy = [-1, 0]
                 p[i].color = "green"
-                p[i].time = str_time
-                print(p[i].name + "sorti en :" + p[i].time)
+                p[i].time = str_time[-2:]
+                # print(p[i].name + "sorti en : " + p[i].time)
 
                 if p[i] not in part_out:
                     part_out.append(p[i])
@@ -391,7 +423,7 @@ def deplacement():
                         break
                     p[i].xcenter = p[i].xcenter + p[i].vx
                     p[i].ycenter = p[i].ycenter + p[i].vy
-                    print(p[i].vy)
+                    # print(p[i].vy)
                     p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
                     p[j].ycoord = p[j].ycoord
                     p[i].color = "Red"
@@ -409,13 +441,14 @@ def deplacement():
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
     particles_out = len(part_out)
-    print(particles_out)
+    # print(particles_out)
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
         print("Everyone is out of the room")
         print("And all of them get out in " + (str)(str_time) + "seconds")
-        exit()
+        refresh()
+        # exit()
 
 
 def suppr():
