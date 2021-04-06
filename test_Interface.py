@@ -75,7 +75,6 @@ coord_sortie = [0, world.height / 2]
 start = 0.0
 str_time = ""
 
-
 #####TRASH##############
 # Not Useful anymore
 
@@ -83,7 +82,6 @@ str_time = ""
 def lancer():
     ##To get the value
     global ListPart
-    global start
 
     interface.setvar(name="Nbr_particles", value=sp.get())
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
@@ -211,8 +209,8 @@ def CreaPart(number):
         # vy = 1 * (coord_sortie[1] - ycenter) / math.sqrt(
         #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
 
-        vx = random.random() * 2 - 1
-        vy = random.random() * 2 - 1
+        vx = random.random() * 5 - 1
+        vy = random.random() * 5 - 1
         # vx, vy = [0, 0]
 
         k = random.randrange(len(possible_types))
@@ -230,11 +228,6 @@ def CreaCrowd(my_particles):
     ### RANDOM CROWD ####
     if (str)(interface.getvar(name="crowd_type")) == "Aléatoire":
         for i in range(0, len(my_particles)):
-            # # Check it is inside the room (but not functional)
-            if (25 +my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (width - 50-my_particles[i].radius):
-                my_particles[i].xcenter = (width - 80) * random.random() + 30
-            if (25 +my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (height - 50-my_particles[i].radius):
-                my_particles[i].ycenter = (height - 80) * random.random() + 30
             # Check it is inside the room (but not functional)
             if (25 + my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (
                     width - 50 - my_particles[i].radius):
@@ -301,7 +294,8 @@ def CreateEnv():
 
     ## Add obstacles to the room (they are created in the class Room)
     for i in range(len(ListObstacles)):
-        print(ListObstacles[i])
+        # # Just to see if it is working
+        # print(ListObstacles[i])
         if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
             interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
                                        (ListObstacles[i].ycenter - ListObstacles[i].radius),
@@ -322,8 +316,8 @@ def deplacement():
     p = ListPart
     # ComputeTraject(p)
 
-    CreateEnv()
     updateTime()  # So as to get the real time
+    CreateEnv()
     collision(p)
 
     for i in range(0, len(p)):
@@ -369,10 +363,6 @@ def deplacement():
                     [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
                     p[i].color = "blue"
 
-        ## Was used to compute the old speed
-        # p[i].xcenter = p[i].xcenter + p[i].vx
-        # p[i].ycenter = p[i].ycenter + p[i].vy
-
         # ## Check for collisions between the balls ####
         for j in range(0, len(ListPart)):
             # Check for collision
@@ -398,79 +388,6 @@ def deplacement():
                     p[i].ycenter = p[i].ycenter
                     p[j].color = "Blue"
 
-        # ### Check for collisions between the balls ####
-        # for j in range(i + 1, len(ListPart)):
-        #     # Check for collision
-        #     while True:
-        #     # if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
-        #         # We keep in memory the first speed
-        #         vx1 = p[i].vx
-        #         vy1 = p[i].vy
-        #         vx2 = p[j].vx
-        #         vy2 = p[j].vy
-        #
-        #         nx = p[i].xcenter - p[j].xcenter
-        #         ny = p[i].ycenter - p[j].ycenter
-        #         nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
-        #         ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-        #         nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
-        #         ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-        #         tx1 = vx1 - nx1
-        #         ty1 = vy1 - ny1
-        #         tx2 = vx2 - nx2
-        #         ty2 = vy2 - ny2
-        #
-        #         # Change the speed between particles
-        #         p[j].vx = tx1 + nx2
-        #         p[j].vy = ty1 + ny2
-        #
-        #         p[i].vx = tx2 + nx1
-        #         p[i].vy = ty2 + ny1
-        #
-        #         p[i].touched += 1
-        #         p[j].touched += 1
-        #         if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
-        #             break
-        #
-        #         # Start of relfexion about visualizing the gradient of contact (to modify)
-        #         if p[i].touched == 1:
-        #             p[i].color = "Yellow"
-        #         if p[j].touched == 1:
-        #             p[j].color = "Yellow"
-        #
-        #         if p[i].touched > 1:
-        #             p[i].color = "Orange"
-        #         if p[j].touched > 1:
-        #             p[j].color = "Orange"
-        #
-        #         if p[i].touched >= 5:
-        #             p[i].color = "Red"
-        #         if p[j].touched >= 5:
-        #             p[j].color = "Red"
-
-            # else:
-            #     if (p[i].xcenter - p[j].ycenter) > 20:
-            #         p[j].ComputeTraj([0, height / 2])
-
-        ##Trying to create the collision angle to reset properly the direction
-        # converter = math.pi / 180  # to convert degrees in radians
-        # if nx == 0:
-        #     p[j].angle = math.pi / 2
-        # else:
-        #     p[j].angle = math.atan(ny / nx)
-
-        # Replace them so as to avoid overlapping
-        # p[j].xcenter += random.random()*7
-        # p[j].ycenter += random.random()*7
-        # p[i].xcenter -= random.random()*7
-        # p[i].ycenter -= random.random()*7
-
-        # if (interface.find_overlapping(p[i].xcenter, p[i].ycenter, p[j].xcenter, p[j].ycenter) == 0):
-        #     p[j].ComputeTraj([0, height / 2])
-        # else:
-        #     p[j].xcenter += random.random() * 5
-        #     p[j].ycenter += random.random() * 5
-
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
     particles_out = len(part_out)
@@ -485,7 +402,6 @@ def deplacement():
 
 def suppr():
     interface.delete('all')
-
 
 # GOAL : Create an environnement before the alerte
 def chilling():
@@ -535,10 +451,6 @@ def chilling():
         #     if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
         #         p[i].vx, p[i].vy = [-p[i].vx, p[i].vy]
 
-        ## Was used to compute the old speed
-        p[i].xcenter = p[i].xcenter + p[i].vx
-        p[i].ycenter = p[i].ycenter + p[i].vy
-
     Simulation.after(20, chilling)
 
 
@@ -559,6 +471,10 @@ def collision(p):
 
         # collision with all obstacles
         p[i].CollisionObstacle2(ListObstacles)
+
+        ## So that they still continue to go through the door
+        p[i].xcenter = p[i].xcenter + p[i].vx
+        p[i].ycenter = p[i].ycenter + p[i].vy
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
