@@ -4,6 +4,9 @@ from datetime import datetime
 from time import *
 from timeit import default_timer
 from tkinter import *
+
+import dateutil
+
 from People import *
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -75,6 +78,7 @@ ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
 start = 0.0
 str_time = ''
+double_time = 0.0
 
 #####TRASH##############
 # Not Useful anymore
@@ -206,11 +210,18 @@ Bouton_Graph.grid(row=6, column=1)  # We add the button to the display of interf
 # Function to take the time needed to get out of the room
 def updateTime():
     global str_time
+    global double_time
     now = default_timer() - start
     minutes, seconds = divmod(now, 60)
     hours, minutes = divmod(minutes, 60)
     str_time = '%d:%02d:%02d' % (hours, minutes, seconds)
     chronolabel['text'] = str_time
+
+    # To have a double of the time
+    time_converter = seconds + minutes * 60 + hours * 3600
+    double_time = float("{:.3f}".format(time_converter))
+    # print("This is the time in double :" + str(double_time) + " en secondes ")
+
     chronolabel.after(1000, updateTime)
 
 
@@ -522,12 +533,12 @@ def collision(p):
                     [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
                     p[i].color = "blue"
 
-        # collision with all obstacles
-        p[i].CollisionObstacle2(ListObstacles)
-
         ## So that they still continue to go through the door
         p[i].xcenter = p[i].xcenter + p[i].vx
         p[i].ycenter = p[i].ycenter + p[i].vy
+
+        # collision with all obstacles
+        p[i].CollisionObstacle2(ListObstacles)
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
@@ -574,6 +585,14 @@ def collision(p):
                     p[i].color = "Red"
                 if p[j].touched >= 5:
                     p[j].color = "Red"
+
+                #####
+                # Trying to create the collision angle to reset properly the direction
+                converter = math.pi / 180  # to convert degrees in radians
+                if nx == 0:
+                    p[j].angle = math.pi / 2
+                else:
+                    p[j].angle = math.atan(ny / nx)
 
             # else:
             #     if (p[i].xcenter - p[j].ycenter) > p[i].radius+p[j].radius +30: #Trying to create inertia
