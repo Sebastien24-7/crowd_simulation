@@ -76,6 +76,7 @@ ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
 ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
+Dsortie = 0.0
 start = 0.0
 str_time = ''
 double_time = 0.0
@@ -85,7 +86,7 @@ double_time = 0.0
 
 def graph():
     fig = Figure()
-    ListPart
+    global ListPart
     l=0
     k=0
     j=0
@@ -131,27 +132,27 @@ def evacuate():
 
 
 def refresh():
+    global part_out
     ## To update the screen of display
     interface.setvar(name="Nbr_part_out", value=len(part_out))
     result.set("Nombre d'individus sorties :" + (str)(
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
 
-    part_out
     fig1 = Figure()
     Y = []
     X = []
-    # for i in range(0,len(part_out)):
-    #     if i != 0 and part_out[i].time == part_out[i - 1].time:
-    #         Y[i - 1] += 1
-    #     else:
-    #         Y[i] += 1
-    #         X[i] = part_out[i].time
-    # print(X,Y)
-    for i in range (0,len(part_out)):
-        # X[i] = part_out[i].time
-        X[i] = i
-        Y[i] = i
+    for i in range(len(part_out)):
+        if i > 1 and part_out[i].time == part_out[i - 1].time:
+            Y.__setitem__(i - 1, Y[i - 1] + 1)
+        else:
+            Y.append(1)
+            X.append(part_out[i].time)
+    print(X, Y)
+    # for i in range(len(part_out)):
+    #     # X[i] = part_out[i].time
+    #     X.append(part_out[i].time)
+    #     Y.append(i)
     fig1.add_subplot(111).plot(X, Y)
     canvas = FigureCanvasTkAgg(fig1, master=Simulation)  # A tk.DrawingArea.
     canvas.draw()
@@ -160,7 +161,7 @@ def refresh():
 
 def graph():
     fig = Figure()
-    ListPart
+    global ListPart
     l=0
     k=0
     j=0
@@ -236,14 +237,12 @@ def countdown(t):
 
     print('Fire in the Building!!')
 
-
 # To uncomment so as to use it
 # # input time in seconds
 # t = input("Enter the time in seconds: ")
 #
 # # function call
 # countdown(int(t))
-
 
 # Creation of the list of people
 def CreaPart(number):
@@ -326,9 +325,10 @@ def CreaCrowd(my_particles):
 
 # Compute and give the adapted speed for the particles to reach the door
 def ComputeTraject(my_particles):
+    global Dsortie
     for i in range(0, len(my_particles)):
         # Compute the distance
-        D = [my_particles[i].xcenter - coord_sortie[0], my_particles[i].ycenter - coord_sortie[1]]
+        Dsortie = [my_particles[i].xcenter - coord_sortie[0], my_particles[i].ycenter - coord_sortie[1]]
         # print(D)
 
         # Give the adapted speed to each particle
@@ -344,26 +344,27 @@ def CreateEnv():
     interface.create_rectangle(20, 20, world.width - 20, world.height - 20, outline="red", width=5)
     interface.grid()
     # Create the door
-    interface.create_line(20, ((world.height- w_porte) / 2 ), 20, ((world.height+ w_porte) / 2 ), fill="green", width=5)
-    interface.create_line(100, (world.height / 2 - w_obstacle), 100, (world.height / 2 + w_obstacle), fill="black", width=5)
+    interface.create_line(20, ((world.height - w_porte) / 2), 20, ((world.height + w_porte) / 2), fill="green", width=5)
+    interface.create_line(100, (world.height / 2 - w_obstacle), 100, (world.height / 2 + w_obstacle), fill="black",
+                          width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
     ## Add obstacles to the room (they are created in the class Room)
-    for i in range(len(ListObstacles)):
-        # # Just to see if it is working
-        # print(ListObstacles[i])
-        if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
-            interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
-                                       (ListObstacles[i].ycenter - ListObstacles[i].radius),
-                                       (ListObstacles[i].xcenter + ListObstacles[i].radius),
-                                       (ListObstacles[i].ycenter + ListObstacles[i].radius),
-                                       fill=ListObstacles[i].color)
-        elif ListObstacles[i].shape == "Circle":
-            interface.create_oval((ListObstacles[i].xcenter - ListObstacles[i].radius),
-                                  (ListObstacles[i].ycenter - ListObstacles[i].radius),
-                                  (ListObstacles[i].xcenter + ListObstacles[i].radius),
-                                  (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
+    # for i in range(len(ListObstacles)):
+    #     # # Just to see if it is working
+    #     # print(ListObstacles[i])
+    #     if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
+    #         interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
+    #                                    (ListObstacles[i].ycenter - ListObstacles[i].radius),
+    #                                    (ListObstacles[i].xcenter + ListObstacles[i].radius),
+    #                                    (ListObstacles[i].ycenter + ListObstacles[i].radius),
+    #                                    fill=ListObstacles[i].color)
+    #     elif ListObstacles[i].shape == "Circle":
+    #         interface.create_oval((ListObstacles[i].xcenter - ListObstacles[i].radius),
+    #                               (ListObstacles[i].ycenter - ListObstacles[i].radius),
+    #                               (ListObstacles[i].xcenter + ListObstacles[i].radius),
+    #                               (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
 
 
 # Creation of the Movement
@@ -453,8 +454,6 @@ def deplacement():
 
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
-    particles_out = len(part_out)
-    # print(particles_out)
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
@@ -538,7 +537,7 @@ def collision(p):
         p[i].ycenter = p[i].ycenter + p[i].vy
 
         # collision with all obstacles
-        p[i].CollisionObstacle2(ListObstacles)
+        # p[i].CollisionObstacle2(ListObstacles)
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
