@@ -5,7 +5,6 @@ from time import *
 from timeit import default_timer
 from tkinter import *
 
-import dateutil
 import pyautogui
 
 from People import *
@@ -17,6 +16,7 @@ from matplotlib.figure import Figure
 from environment import *
 import numpy as np
 from matplotlib import pyplot as plt
+
 
 ##SETUP
 # On cree une fenetre et un canevas:
@@ -39,6 +39,7 @@ interface.grid(row=1, column=1)
 
 interface2 = Canvas(Simulation, width=width / 2, height=height / 2, bd=0, bg="white", cursor="cross")
 interface2.grid(row=1, column=2)
+
 
 ##### Trying to set up the screen of simulation
 Frame2 = Frame(Simulation, borderwidth=5, relief=SUNKEN, height=50, width=100)
@@ -68,8 +69,8 @@ sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
 ### VARIABLES
-w_porte = 20
-w_obstacle = 200
+w_porte = 30
+w_obstacle = 30
 part_out = []
 ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
@@ -106,7 +107,6 @@ def graph():
     canvas.draw()
     canvas.get_tk_widget().grid(row=1, column=2)
 
-
 # Function to display some data
 def lancer():
     ##To get the value
@@ -131,6 +131,16 @@ def evacuate():
     global start
     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
     deplacement()
+
+
+def screen():
+    # Take automatic screenshot
+    if 3.0 < double_time < 3.1:
+        print("It's past 3 seconds")
+        im = pyautogui.screenshot(region=(150, 80, 500, 500))
+        ## To modify if you wants to take screens automaticcally into your documents
+        im.save(r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Let pass closest\Evac_Social_Ordered_N' + str(
+            len(ListPart)) + '.png')
 
 
 def refresh():
@@ -162,6 +172,7 @@ def refresh():
 def select():
     print(crowd_type.get())
 
+
 ##Creation of RadioButton to select how to study the room evacuation :
 crowdlabel = Label(Frame2, textvariable=crowd_selec)
 R1 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
@@ -184,6 +195,10 @@ Bouton_Refresh.grid(row=5, column=2)  # We add the button to the display of inte
 
 Bouton_Graph = Button(Frame2, text='Graphique', command=graph, activebackground="RED")
 Bouton_Graph.grid(row=6, column=1)  # We add the button to the display of interface tk
+
+# Creation of a Button "Refresh":
+Bouton_Screen = Button(Frame2, text='Screenshot', command=screen, activebackground="RED")
+Bouton_Screen.grid(row=6, column=0)  # We add the button to the display of interface tk
 
 
 ###########
@@ -215,7 +230,6 @@ def countdown(t):
         t -= 1
 
     print('Fire in the Building!!')
-
 
 # To uncomment so as to use it
 # # input time in seconds
@@ -432,6 +446,7 @@ def deplacement():
 
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
+    screen()
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
@@ -443,7 +458,6 @@ def deplacement():
 
 def suppr():
     interface.delete('all')
-
 
 # GOAL : Create an environnement before the alert
 def chilling():
