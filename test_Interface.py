@@ -69,7 +69,7 @@ sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
 ### VARIABLES
-w_porte = 200
+w_porte = 30
 w_obstacle = 30
 part_out = []
 ListPart = []
@@ -80,7 +80,7 @@ Dsortie = 0.0
 start = 0.0
 str_time = ''
 double_time = 0.0
-
+dt=20
 #####TRASH##############
 # Not Useful anymore
 
@@ -132,7 +132,6 @@ def evacuate():
 
 
 def refresh():
-    global part_out
     ## To update the screen of display
     interface.setvar(name="Nbr_part_out", value=len(part_out))
     result.set("Nombre d'individus sorties :" + (str)(
@@ -435,8 +434,8 @@ def deplacement():
                 if (p[i].Distance([0, world.height / 2]) <= p[j].Distance([0, world.height / 2])):
                     if p[i].xcoord < 0:
                         break
-                    p[i].xcenter = p[i].xcenter + p[i].vx
-                    p[i].ycenter = p[i].ycenter + p[i].vy
+                    p[i].xcenter = p[i].xcenter + p[i].vx*dt
+                    p[i].ycenter = p[i].ycenter + p[i].vy*dt
                     # print(p[i].vy)
                     p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
                     p[j].ycoord = p[j].ycoord
@@ -446,14 +445,14 @@ def deplacement():
                 else:
                     if p[i].xcenter < 0:
                         break
-                    p[j].xcenter = p[j].xcenter + p[j].vx
-                    p[j].ycenter = p[j].ycenter + p[j].vy
+                    p[j].xcenter = p[j].xcenter + p[j].vx*dt
+                    p[j].ycenter = p[j].ycenter + p[j].vy*dt
                     p[i].xcenter = p[i].xcenter
                     p[i].ycenter = p[i].ycenter
                     p[j].color = "Blue"
 
     # To reduce the speed of simulation
-    Simulation.after(20, deplacement)
+    Simulation.after(dt, deplacement)
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
@@ -466,7 +465,7 @@ def deplacement():
 def suppr():
     interface.delete('all')
 
-# GOAL : Create an environnement before the alerte
+# GOAL : Create an environnement before the alert
 def chilling():
     interface.delete('all')
 
@@ -514,7 +513,7 @@ def chilling():
         #     if (world.height / 2 - w_porte) - 20 < interface.coords(b)[1] < (world.height / 2 + w_porte):
         #         p[i].vx, p[i].vy = [-p[i].vx, p[i].vy]
 
-    Simulation.after(20, chilling)
+    Simulation.after(dt, chilling)
 
 
 def collision(p):
@@ -560,11 +559,11 @@ def collision(p):
                 ty2 = vy2 - ny2
 
                 # Change the speed between particles
-                p[j].vx = tx1 + nx2
-                p[j].vy = ty1 + ny2
+                p[j].vx = (tx1 + nx2)/math.sqrt(tx1**2+nx2**2)
+                p[j].vy = (ty1 + ny2)/math.sqrt(ty1**2+ny2**2)
 
-                p[i].vx = tx2 + nx1
-                p[i].vy = ty2 + ny1
+                p[i].vx = (tx2 + nx1)/math.sqrt(tx2**2+nx1**2)
+                p[i].vy = (ty2 + ny1)/math.sqrt(ty2**2+ny1**2)
 
                 p[i].touched += 1
                 p[j].touched += 1
