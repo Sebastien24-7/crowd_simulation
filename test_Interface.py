@@ -80,7 +80,7 @@ Dsortie = 0.0
 start = 0.0
 str_time = ''
 double_time = 0.0
-dt = 0.1
+dt = 0.01
 
 
 #####TRASH##############
@@ -372,7 +372,7 @@ def deplacement():
 
     updateTime()  # So as to get the real time
     CreateEnv()
-    collision(p)
+    # collision(p)
 
     for i in range(0, len(p)):
 
@@ -381,9 +381,9 @@ def deplacement():
         interface.grid()
 
         if (p[i].Distance([0, (world.height - w_porte) / 2])) < p[i].Distance([0, (world.height + w_porte) / 2]):
-            p[i].ComputeTraj([0, (world.height - w_porte) / 2])
+            p[i].ComputeTraj([0, random.random()*(world.height - w_porte) / 2 + (world.height - w_porte) / 2])
         else:
-            p[i].ComputeTraj([0, (world.height + w_porte) / 2])
+            p[i].ComputeTraj([0, random.random()*(world.height + w_porte) / 2 + (world.height + w_porte) / 2])
 
         # Check for bouncing on the walls or going through the door
 
@@ -584,29 +584,34 @@ def collision(p):
                     vx2 = p[j].vx
                     vy2 = p[j].vy
 
-                    nx = p[i].xcenter - p[j].xcenter
-                    ny = p[i].ycenter - p[j].ycenter
-                    nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
-                    ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                    nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
-                    ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                    tx1 = vx1 - nx1
-                    ty1 = vy1 - ny1
-                    tx2 = vx2 - nx2
-                    ty2 = vy2 - ny2
-
-                    # Change the speed between particles
-                    if tx1 + nx2 != 0:
-                        p[j].vx = (tx1 + nx2) / math.sqrt(tx1 ** 2 + nx2 ** 2)
-                    if ty1 + ny2 != 0:
-                        p[j].vy = (ty1 + ny2) / math.sqrt(ty1 ** 2 + ny2 ** 2)
-                    if tx2 + nx1 != 0:
-                        p[i].vx = (tx2 + nx1) / math.sqrt(tx2 ** 2 + nx1 ** 2)
-                    if ty2 + ny1 != 0:
-                        p[i].vy = (ty2 + ny1) / math.sqrt(ty2 ** 2 + ny1 ** 2)
+                    # 1ere methode
+                    # nx = p[i].xcenter - p[j].xcenter
+                    # ny = p[i].ycenter - p[j].ycenter
+                    # nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
+                    # ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                    # nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
+                    # ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                    # tx1 = vx1 - nx1
+                    # ty1 = vy1 - ny1
+                    # tx2 = vx2 - nx2
+                    # ty2 = vy2 - ny2
+                    #
+                    # # Change the speed between particles
+                    # if tx1 + nx2 != 0:
+                    #     p[j].vx = (tx1 + nx2) / math.sqrt(tx1 ** 2 + nx2 ** 2)
+                    # if ty1 + ny2 != 0:
+                    #     p[j].vy = (ty1 + ny2) / math.sqrt(ty1 ** 2 + ny2 ** 2)
+                    # if tx2 + nx1 != 0:
+                    #     p[i].vx = (tx2 + nx1) / math.sqrt(tx2 ** 2 + nx1 ** 2)
+                    # if ty2 + ny1 != 0:
+                    #     p[i].vy = (ty2 + ny1) / math.sqrt(ty2 ** 2 + ny1 ** 2)
 
                     # p[i].xcenter = p[i].xcenter + p[i].vx
                     # p[i].ycenter = p[i].ycenter + p[i].vy
+
+                    # 2eme methode
+                    p[i].col(p[j])
+
 
                     p[j].xcenter = p[j].xcenter + p[j].vx
                     p[j].ycenter = p[j].ycenter + p[j].vy
@@ -633,10 +638,10 @@ def collision(p):
                     #####
                     # Trying to create the collision angle to reset properly the direction
                     converter = math.pi / 180  # to convert degrees in radians
-                    if nx == 0:
-                        p[j].angle = math.pi / 2
-                    else:
-                        p[j].angle = math.atan(ny / nx)
+                    # if nx == 0:
+                    #     p[j].angle = math.pi / 2
+                    # else:
+                    #     p[j].angle = math.atan(ny / nx)
 
             # else:
         #     if (p[i].xcenter - p[j].ycenter) > p[i].radius+p[j].radius +30: #Trying to create inertia
@@ -677,6 +682,11 @@ def theory():
 
     t_total = max(tevac)  # Temps total de l'évacuation correspond à la valeur la plus élevée d'évacuation
     print("Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
+
+
+
+
+
 
 
 # On lance la boucle principale:

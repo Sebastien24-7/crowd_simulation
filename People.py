@@ -6,6 +6,7 @@ import numpy
 from PIL import Image
 from PIL import ImageDraw
 
+
 ###############################
 
 class People():
@@ -22,6 +23,7 @@ class People():
     radius: int
 
     """
+
     def __init__(self, xcenter, ycenter, vx, vy, type):
         """
         Constructor of a Particle object
@@ -62,7 +64,9 @@ class People():
         self.touched = 0
         self.masse = 1
         self.angle = 0
-        self.vx, self.vy = (self.speed*vx, self.speed*vy)
+        self.vx, self.vy = (self.speed * vx, self.speed * vy)
+        self.vit = math.sqrt(vx ** 2 + vy ** 2)
+        self.theta = self.vx / self.vit
         self.good_pos = False
         self.time = 0
 
@@ -136,8 +140,8 @@ class People():
                 # Right of the Obstacle
                 if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,
                                   ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                        [ListObstacles[i].xcenter + ListObstacles[i].radius,
-                         ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                    [ListObstacles[i].xcenter + ListObstacles[i].radius,
+                     ListObstacles[i].ycenter + ListObstacles[i].radius]):
                     [self.vx, self.vy] = [0, +(self.vy + self.vx)]
                     self.color = "black"
                 else:
@@ -147,8 +151,8 @@ class People():
                 # Left of the Obstacle
                 if self.Distance([ListObstacles[i].xcenter - ListObstacles[i].radius,
                                   ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                        [ListObstacles[i].xcenter - ListObstacles[i].radius,
-                         ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                    [ListObstacles[i].xcenter - ListObstacles[i].radius,
+                     ListObstacles[i].ycenter + ListObstacles[i].radius]):
                     [self.vx, self.vy] = [0, +(self.vy + self.vx)]
                     self.color = "black"
                 else:
@@ -176,3 +180,23 @@ class People():
                 else:
                     [self.vx, self.vy] = [-(self.vy + self.vx), 0]
                     self.color = "blue"
+
+    def col(self, p):
+
+        v1 = self.vit
+        th1 = self.theta
+        v2 = p.vit
+        th2 = p.theta
+
+        theta11 = math.atan((v2 / v1) * (math.sin(th2) / math.cos(th1)))
+        v11 = math.sqrt((v2 * math.sin(th2)) ** 2 + (v1 * math.cos(th1)) ** 2)
+
+        theta22 = math.atan((v1 / v2) * (math.sin(th1) / math.cos(th2)))
+        v22 = math.sqrt((v1 * math.sin(th1)) ** 2 + (v2 * math.cos(th2)) ** 2)
+        # il faut projeter sur le repere xy de l'affichage et modif vx et vy
+
+        self.vx = v11 * math.cos(theta11)
+        self.vy = v11 * math.sin(theta11)
+
+        p.vx = v22 * math.sin(theta22)
+        p.vy = v22 * math.sin(theta22)
