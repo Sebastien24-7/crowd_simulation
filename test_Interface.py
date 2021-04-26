@@ -261,6 +261,7 @@ def CreaPart(number):
         vy = random.random() * 2 - 1
         # vx, vy = [0, 0]
 
+        ## To produce a Gaussian repartition of the population
         k = random.random()
         if k < 0.6:
             type = possible_types[1]
@@ -279,21 +280,42 @@ def CreaPart(number):
 def CreaCrowd(my_particles):
     ### RANDOM CROWD ####
     if (str)(interface.getvar(name="crowd_type")) == "Aléatoire":
-        for i in range(0, len(my_particles)):
+        for i in range(len(my_particles)):
             # Check it is inside the room (but not functional)
-            if (25 + my_particles[i].radius) > my_particles[i].xcenter or my_particles[i].xcenter > (
-                    width - 50 - my_particles[i].radius):
+            if my_particles[i].xcenter < (25 - my_particles[i].radius) or my_particles[i].xcenter > (
+                    width - 25 + my_particles[i].radius):
                 my_particles[i].xcenter = (width - 80) * random.random() + 30
-            if (25 + my_particles[i].radius) > my_particles[i].ycenter or my_particles[i].ycenter > (
-                    height - 50 - my_particles[i].radius):
+                print(" I was going outside")
+            if my_particles[i].ycenter < (25 - my_particles[i].radius) or my_particles[i].ycenter > (
+                    height - 25 + my_particles[i].radius):
                 my_particles[i].ycenter = (height - 80) * random.random() + 30
+                print(" I was going outside")
 
-            # Checking the overlapping between particles
-            for j in range(0, len(my_particles)):
-                if my_particles[i].distance_collision(my_particles[j]) < (
-                        my_particles[i].radius + my_particles[j].radius):
-                    my_particles[i].xcenter = (world.width - 80) * random.random() + 30
-                    my_particles[i].ycenter = (world.height - 80) * random.random() + 30
+            # if i!=0 and  my_particles[i].distance_collision(my_particles[i-1]) < (my_particles[i].radius + my_particles[i-1].radius):
+            #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
+            #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
+            #     print(" I was going over a friend")
+
+            # # Checking the overlapping between particles
+            for j in range(len(my_particles)):
+                # if my_particles[i].distance_collision(my_particles[j]) < (
+                #         my_particles[i].radius + my_particles[j].radius):
+                #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
+                #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
+                #     print(" I was going over a friend")
+                #
+                #     if my_particles[i].distance_collision(my_particles[j]) < (
+                #             my_particles[i].radius + my_particles[j].radius):
+                #          print(" I 'm still going over a friend")
+                print("I do my work")
+                while my_particles[j].xcenter - my_particles[j].radius <= my_particles[i].xcenter <= my_particles[
+                    j].xcenter:
+                    my_particles[i].xcenter -= my_particles[j].radius - 25
+                    my_particles[i].ycenter -= my_particles[j].radius - 25
+                while my_particles[j].xcenter + my_particles[j].radius >= my_particles[i].xcenter >= my_particles[
+                    j].xcenter:
+                    my_particles[i].xcenter += my_particles[j].radius + 25
+                    my_particles[i].ycenter += my_particles[j].radius + 25
 
     ## ORDERED CROWD ####
     if (str)(interface.getvar(name="crowd_type")) == "Homogène":
@@ -302,10 +324,8 @@ def CreaCrowd(my_particles):
         i = 0
         j = 4
         for k in range(0, len(my_particles)):
-            # my_particles[k].vx = 0
-            # my_particles[k].vy = 0
-            # my_particles[k].xcenter = 40
-            # my_particles[k].ycenter = 40
+            # my_particles[k].vx , my_particles[k].vy = 0 , 0
+            # my_particles[k].xcenter , my_particles[k].ycenter = 40 , 40
             if 40 * i <= 420:
                 i = i + 1
                 my_particles[k].xcenter = 40 * i
@@ -381,9 +401,9 @@ def deplacement():
         interface.grid()
 
         if (p[i].Distance([0, (world.height - w_porte) / 2])) < p[i].Distance([0, (world.height + w_porte) / 2]):
-            p[i].ComputeTraj([0, random.random()*(world.height - w_porte) / 2 + (world.height - w_porte) / 2])
+            p[i].ComputeTraj([0, (world.height - w_porte) / 2])
         else:
-            p[i].ComputeTraj([0, random.random()*(world.height + w_porte) / 2 + (world.height + w_porte) / 2])
+            p[i].ComputeTraj([0, (world.height + w_porte) / 2])
 
         # Check for bouncing on the walls or going through the door
 
@@ -571,23 +591,64 @@ def collision(p):
         p[i].xcenter = p[i].xcenter + p[i].vx
         p[i].ycenter = p[i].ycenter + p[i].vy
 
-        # collision with all obstacles
+        #### collision with all obstacles
         # p[i].CollisionObstacle2(ListObstacles)
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
             # if dans_la_porte==0:
-                if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
-                    # We keep in memory the first speed
-                    vx1 = p[i].vx
-                    vy1 = p[i].vy
-                    vx2 = p[j].vx
-                    vy2 = p[j].vy
+            if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
+                ### AVEC CES DEUX LIGNES ON RETROUVE UN MODELE SIMPLE DE COLLISION FONCTIONNANT###
+                p[i].vx, p[j].vx = p[j].vx, p[i].vx
+                p[i].vy, p[j].vy = p[j].vy, p[i].vy
 
-                    # 1ere methode
-                    # nx = p[i].xcenter - p[j].xcenter
-                    # ny = p[i].ycenter - p[j].ycenter
-                    # nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
+                # # We keep in memory the first speed
+                # vx1 = p[i].vx
+                # vy1 = p[i].vy
+                # vx2 = p[j].vx
+                # vy2 = p[j].vy
+                #
+                # nx = p[i].xcenter - p[j].xcenter
+                # ny = p[i].ycenter - p[j].ycenter
+                # nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
+                # ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                # nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
+                # ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                # tx1 = vx1 - nx1
+                # ty1 = vy1 - ny1
+                # tx2 = vx2 - nx2
+                # ty2 = vy2 - ny2
+                #
+                # # Change the speed between particles
+                # if tx1 + nx2 != 0:
+                #     p[j].vx = (tx1 + nx2) / math.sqrt(tx1 ** 2 + nx2 ** 2)
+                # if ty1 + ny2 != 0:
+                #     p[j].vy = (ty1 + ny2) / math.sqrt(ty1 ** 2 + ny2 ** 2)
+                # if tx2 + nx1 != 0:
+                #     p[i].vx = (tx2 + nx1) / math.sqrt(tx2 ** 2 + nx1 ** 2)
+                # if ty2 + ny1 != 0:
+                #     p[i].vy = (ty2 + ny1) / math.sqrt(ty2 ** 2 + ny1 ** 2)
+                #
+                # # p[i].xcenter = p[i].xcenter + p[i].vx
+                # # p[i].ycenter = p[i].ycenter + p[i].vy
+                #
+                # p[j].xcenter = p[j].xcenter + p[j].vx
+                # p[j].ycenter = p[j].ycenter + p[j].vy
+                #
+                # p[i].touched += 1
+                # p[j].touched += 1
+                #
+                # #### Start of relfexion about visualizing the gradient of contact (to modify)
+                # We keep in memory the first speed
+                vx1 = p[i].vx
+                vy1 = p[i].vy
+                vx2 = p[j].vx
+                vy2 = p[j].vy
+
+                # 1ere methode
+                # nx = p[i].xcenter - p[j].xcenter
+                # ny = p[i].ycenter - p[j].ycenter
+                # nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
                     # ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
                     # nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
                     # ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
@@ -626,22 +687,22 @@ def collision(p):
                     #     p[j].color = "Yellow"
                     #
                     # if p[i].touched > 1:
-                    #     p[i].color = "Orange"
-                    # if p[j].touched > 1:
-                    #     p[j].color = "Orange"
-                    #
-                    # if p[i].touched >= 5:
-                    #     p[i].color = "Red"
-                    # if p[j].touched >= 5:
-                    #     p[j].color = "Red"
+                #     p[i].color = "Orange"
+                # if p[j].touched > 1:
+                #     p[j].color = "Orange"
+                #
+                # if p[i].touched >= 5:
+                #     p[i].color = "Red"
+                # if p[j].touched >= 5:
+                #     p[j].color = "Red"
 
-                    #####
-                    # Trying to create the collision angle to reset properly the direction
-                    converter = math.pi / 180  # to convert degrees in radians
-                    # if nx == 0:
-                    #     p[j].angle = math.pi / 2
-                    # else:
-                    #     p[j].angle = math.atan(ny / nx)
+                #####
+                # # Trying to create the collision angle to reset properly the direction
+                # converter = math.pi / 180  # to convert degrees in radians
+                # if nx == 0:
+                #     p[j].angle = math.pi / 2
+                # else:
+                #     p[j].angle = math.atan(ny / nx)
 
             # else:
         #     if (p[i].xcenter - p[j].ycenter) > p[i].radius+p[j].radius +30: #Trying to create inertia
@@ -682,11 +743,6 @@ def theory():
 
     t_total = max(tevac)  # Temps total de l'évacuation correspond à la valeur la plus élevée d'évacuation
     print("Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
-
-
-
-
-
 
 
 # On lance la boucle principale:
