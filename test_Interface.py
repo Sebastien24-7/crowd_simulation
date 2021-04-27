@@ -6,6 +6,7 @@ from timeit import default_timer
 from tkinter import *
 
 import pyautogui
+import csv
 
 from People import *
 from matplotlib.backends.backend_tkagg import (
@@ -140,7 +141,7 @@ def screen():
         # im = pyautogui.screenshot(region=(150, 80, 500, 500))
         # ## To modify if you wants to take screens automaticcally into your documents
         # im.save(r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Let pass closest\Evac_Social_Ordered_N' + str(
-        #     len(ListPart)) + '.png')
+        # len(ListPart)) + '.png')
 
 
 def refresh():
@@ -150,26 +151,39 @@ def refresh():
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
     theory()
-    # print("Temps total théorique nécessaire pour sortir : " + str(theo_time.t_total)) # Ne fonctionne pas pour l'instant problème d'indentation
 
+    ###Doesn't Work....####
     # fig1 = Figure()
     # Y = []
     # X = []
+    # newY = []
     # for i in range(len(part_out)):
-    #     if i > 1 and part_out[i].time == part_out[i - 1].time:
-    #         Y.__setitem__(i - 1, Y[i - 1] + 1)
-    #     else:
+    #     # print(part_out[i].time)
+    #     # if i > 1 and (part_out[i].time) == (part_out[i - 1].time) :
+    #     #     Y.__setitem__(i - 1, Y[i - 1] + 1)
+    #     # else:
     #         Y.append(1)
-    #         X.append(part_out[i].time)
-    # print(X, Y)
-    # # for i in range(len(part_out)):
-    # #     # X[i] = part_out[i].time
-    # #     X.append(part_out[i].time)
-    # #     Y.append(i)
+    #         X.append(int(part_out[i].time))
+    #
+    # # for i in range(len(X)):
+    # #     X_int = list(map(int, X))
+    # #     if i>1 and X_int[i-1]==X_int[i] and len(X)==len(Y) :
+    # #         X_int.pop(i)
+    # #         Y[i-1] += 1
+    # #         Y.pop(i)
+    #
+    # Tab = [X, Y]
+    # print(Tab)
+    #
     # fig1.add_subplot(111).plot(X, Y)
     # canvas = FigureCanvasTkAgg(fig1, master=Simulation)  # A tk.DrawingArea.
     # canvas.draw()
     # canvas.get_tk_widget().grid(row=1, column=2)
+    #
+    # with open('test.csv','w',newline='') as f :
+    #     for i in range(len(X)):
+    #         writer = csv.writer(f)
+    #         writer.writerows(Tab)
 
 def select():
     print(crowd_type.get())
@@ -291,31 +305,32 @@ def CreaCrowd(my_particles):
                 my_particles[i].ycenter = (height - 80) * random.random() + 30
                 print(" I was going outside")
 
-            # if i!=0 and  my_particles[i].distance_collision(my_particles[i-1]) < (my_particles[i].radius + my_particles[i-1].radius):
+            if i != 0 and my_particles[i].distance_collision(my_particles[i - 1]) < (
+                    my_particles[i].radius + my_particles[i - 1].radius):
+                my_particles[i].xcenter = (world.width - 50) * random.random() + 30
+                my_particles[i].ycenter = (world.height - 50) * random.random() + 30
+                print(" I was going over a friend")
+
+            # # Checking the overlapping between particles
+            # for j in range(len(my_particles)):
+            # if my_particles[i].distance_collision(my_particles[j]) < (
+            #         my_particles[i].radius + my_particles[j].radius):
             #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
             #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
             #     print(" I was going over a friend")
-
-            # # Checking the overlapping between particles
-            for j in range(len(my_particles)):
-                # if my_particles[i].distance_collision(my_particles[j]) < (
-                #         my_particles[i].radius + my_particles[j].radius):
-                #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
-                #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
-                #     print(" I was going over a friend")
-                #
-                #     if my_particles[i].distance_collision(my_particles[j]) < (
-                #             my_particles[i].radius + my_particles[j].radius):
-                #          print(" I 'm still going over a friend")
-                print("I do my work")
-                while my_particles[j].xcenter - my_particles[j].radius <= my_particles[i].xcenter <= my_particles[
-                    j].xcenter:
-                    my_particles[i].xcenter -= my_particles[j].radius - 25
-                    my_particles[i].ycenter -= my_particles[j].radius - 25
-                while my_particles[j].xcenter + my_particles[j].radius >= my_particles[i].xcenter >= my_particles[
-                    j].xcenter:
-                    my_particles[i].xcenter += my_particles[j].radius + 25
-                    my_particles[i].ycenter += my_particles[j].radius + 25
+            #
+            #     if my_particles[i].distance_collision(my_particles[j]) < (
+            #             my_particles[i].radius + my_particles[j].radius):
+            #          print(" I 'm still going over a friend")
+            # print("I do my work")
+            # while my_particles[j].xcenter - my_particles[j].radius <= my_particles[i].xcenter <= my_particles[
+            #     j].xcenter:
+            #     my_particles[i].xcenter -= my_particles[j].radius - 25
+            #     my_particles[i].ycenter -= my_particles[j].radius - 25
+            # while my_particles[j].xcenter + my_particles[j].radius >= my_particles[i].xcenter >= my_particles[
+            #     j].xcenter:
+            #     my_particles[i].xcenter += my_particles[j].radius + 25
+            #     my_particles[i].ycenter += my_particles[j].radius + 25
 
     ## ORDERED CROWD ####
     if (str)(interface.getvar(name="crowd_type")) == "Homogène":
@@ -361,14 +376,14 @@ def CreateEnv():
     interface.grid()
     # Create the door
     interface.create_line(20, ((world.height - w_porte) / 2), 20, ((world.height + w_porte) / 2), fill="green", width=5)
-    interface.create_line(100, (world.height / 2 - w_obstacle), 100, (world.height / 2 + w_obstacle), fill="black",
-                          width=5)
+    ## Create the wall
+    # interface.create_line(100, (world.height / 2 - w_obstacle), 100, (world.height / 2 + w_obstacle), fill="black",width=5)
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
-    ## Add obstacles to the room (they are created in the class Room)
+    # Add obstacles to the room (they are created in the class Room)
     # for i in range(len(ListObstacles)):
-    #     # # Just to see if it is working
+    #     ## Just to see if it is working
     #     # print(ListObstacles[i])
     #     if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
     #         interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
@@ -382,7 +397,6 @@ def CreateEnv():
     #                               (ListObstacles[i].xcenter + ListObstacles[i].radius),
     #                               (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
 
-
 # Creation of the Movement
 def deplacement():
     interface.delete('all')
@@ -392,7 +406,7 @@ def deplacement():
 
     updateTime()  # So as to get the real time
     CreateEnv()
-    # collision(p)
+    collision(p)
 
     for i in range(0, len(p)):
 
@@ -443,29 +457,29 @@ def deplacement():
         #             p[i].color = "blue"
 
         ### MODELE EGOISTE (enlever) LAISSER PASSER (laisser) ###
-        # ## Check for collisions between the balls ####
-        for j in range(0, len(ListPart)):
-            # Check for collision
-            if (p[i].distance_collision(p[j]) <= p[i].radius + p[j].radius):
-                if (p[i].Distance([0, world.height / 2]) <= p[j].Distance([0, world.height / 2])):
-                    if p[i].xcenter < 20:
-                        break
-                    p[i].xcenter = p[i].xcenter + p[i].vx * dt
-                    p[i].ycenter = p[i].ycenter + p[i].vy * dt
-                    # print(p[i].vy)
-                    p[j].xcenter = p[j].xcenter # Stays behind the particle closer to the door
-                    p[j].ycenter = p[j].ycenter
-                    p[i].color = "Red"
-                    if p[i].distance_collision(p[j]) > 20:  # To stop computing when they're afar
-                        break
-                else:
-                    if p[i].xcenter < 20:
-                        break
-                    p[j].xcenter = p[j].xcenter + p[j].vx * dt
-                    p[j].ycenter = p[j].ycenter + p[j].vy * dt
-                    p[i].xcenter = p[i].xcenter
-                    p[i].ycenter = p[i].ycenter
-                    p[j].color = "Blue"
+        ## Check for collisions between the balls ####
+        # for j in range(0, len(ListPart)):
+        #     # Check for collision
+        #     if (p[i].distance_collision(p[j]) <= p[i].radius + p[j].radius):
+        #         if (p[i].Distance([0, world.height / 2]) <= p[j].Distance([0, world.height / 2])):
+        #             if p[i].xcenter < 20:
+        #                 break
+        #             p[i].xcenter = p[i].xcenter + p[i].vx * dt
+        #             p[i].ycenter = p[i].ycenter + p[i].vy * dt
+        #             # print(p[i].vy)
+        #             p[j].xcenter = p[j].xcenter # Stays behind the particle closer to the door
+        #             p[j].ycenter = p[j].ycenter
+        #             p[i].color = "Red"
+        #             if p[i].distance_collision(p[j]) > 20:  # To stop computing when they're afar
+        #                 break
+        #         else:
+        #             if p[i].xcenter < 20:
+        #                 break
+        #             p[j].xcenter = p[j].xcenter + p[j].vx * dt
+        #             p[j].ycenter = p[j].ycenter + p[j].vy * dt
+        #             p[i].xcenter = p[i].xcenter
+        #             p[i].ycenter = p[i].ycenter
+        #             p[j].color = "Blue"
 
     # To reduce the speed of simulation
     Simulation.after(20, deplacement)
@@ -536,6 +550,7 @@ def chilling():
 
 def collision(p):
     ### Check for collisions between the balls ####
+
     for i in range(0, len(p)):
         dans_la_porte = (p[i].xcenter - p[i].radius) < 50 & ((world.height / 2 - w_porte) < p[i].ycenter < (world.height / 2 + w_porte))
         if dans_la_porte == 1:
@@ -557,35 +572,35 @@ def collision(p):
                 if (world.height / 2 - w_porte) < p[i].ycenter - p[i].radius < (world.height / 2 + w_porte) - 20:
                     p[i].vx, p[i].vy = [-1, 0]
                     p[i].color = "green"
-                    p[i].time = str_time[-2:]
+                    p[i].time = double_time
                     # print(p[i].name + "sorti en : " + p[i].time)
                     if p[i] not in part_out:
                         part_out.append(p[i])
                 else:
                     p[i].ComputeTraj([(world.width / 2), (world.height / 2)])
 
-        # le mur
-        if p[i].vx < 0:
-            if 100 < (p[i].xcenter - p[i].radius) < 105:
-                if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (world.height / 2 + w_obstacle):
-                    if p[i].Distance([100, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                            [100, (world.height / 2 + w_obstacle)]):
-                        [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
-                        p[i].color = "black"
-                    else:
-                        [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
-                        p[i].color = "blue"
-
-        if p[i].vx > 0:
-            if 95 < (p[i].xcenter + p[i].radius) < 100:
-                if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (world.height / 2 + w_obstacle):
-                    if p[i].Distance([100, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                            [100, (world.height / 2 + w_obstacle)]):
-                        [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
-                        p[i].color = "black"
-                    else:
-                        [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
-                        p[i].color = "blue"
+        ### Le mur
+        # if p[i].vx < 0:
+        #     if 100 < (p[i].xcenter - p[i].radius) < 105:
+        #         if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (world.height / 2 + w_obstacle):
+        #             if p[i].Distance([100, (world.height / 2 - w_obstacle)]) > p[i].Distance(
+        #                     [100, (world.height / 2 + w_obstacle)]):
+        #                 [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
+        #                 p[i].color = "black"
+        #             else:
+        #                 [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
+        #                 p[i].color = "blue"
+        #
+        # if p[i].vx > 0:
+        #     if 95 < (p[i].xcenter + p[i].radius) < 100:
+        #         if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (world.height / 2 + w_obstacle):
+        #             if p[i].Distance([100, (world.height / 2 - w_obstacle)]) > p[i].Distance(
+        #                     [100, (world.height / 2 + w_obstacle)]):
+        #                 [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
+        #                 p[i].color = "black"
+        #             else:
+        #                 [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
+        #                 p[i].color = "blue"
 
         ## So that they still continue to go through the door
         p[i].xcenter = p[i].xcenter + p[i].vx
@@ -640,61 +655,60 @@ def collision(p):
                 #
                 # #### Start of relfexion about visualizing the gradient of contact (to modify)
                 # We keep in memory the first speed
-                vx1 = p[i].vx
-                vy1 = p[i].vy
-                vx2 = p[j].vx
-                vy2 = p[j].vy
+                # vx1 = p[i].vx
+                # vy1 = p[i].vy
+                # vx2 = p[j].vx
+                # vy2 = p[j].vy
 
                 # 1ere methode
                 # nx = p[i].xcenter - p[j].xcenter
                 # ny = p[i].ycenter - p[j].ycenter
                 # nx1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * nx
-                    # ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                    # nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
-                    # ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
-                    # tx1 = vx1 - nx1
-                    # ty1 = vy1 - ny1
-                    # tx2 = vx2 - nx2
-                    # ty2 = vy2 - ny2
-                    #
-                    # # Change the speed between particles
-                    # if tx1 + nx2 != 0:
-                    #     p[j].vx = (tx1 + nx2) / math.sqrt(tx1 ** 2 + nx2 ** 2)
-                    # if ty1 + ny2 != 0:
-                    #     p[j].vy = (ty1 + ny2) / math.sqrt(ty1 ** 2 + ny2 ** 2)
-                    # if tx2 + nx1 != 0:
-                    #     p[i].vx = (tx2 + nx1) / math.sqrt(tx2 ** 2 + nx1 ** 2)
-                    # if ty2 + ny1 != 0:
-                    #     p[i].vy = (ty2 + ny1) / math.sqrt(ty2 ** 2 + ny1 ** 2)
-
-                    # p[i].xcenter = p[i].xcenter + p[i].vx
-                    # p[i].ycenter = p[i].ycenter + p[i].vy
-
-                    # 2eme methode
-                    p[i].col(p[j])
-
-
-                    p[j].xcenter = p[j].xcenter + p[j].vx
-                    p[j].ycenter = p[j].ycenter + p[j].vy
-
-                    p[i].touched += 1
-                    p[j].touched += 1
-
-                    # Start of relfexion about visualizing the gradient of contact (to modify)
-                    # if p[i].touched == 1:
-                    #     p[i].color = "Yellow"
-                    # if p[j].touched == 1:
-                    #     p[j].color = "Yellow"
-                    #
-                    # if p[i].touched > 1:
-                #     p[i].color = "Orange"
-                # if p[j].touched > 1:
-                #     p[j].color = "Orange"
+                # ny1 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                # nx2 = ((vx2 * nx + vy2 * ny) / (nx * nx + ny * ny)) * nx
+                # ny2 = ((vx1 * nx + vy1 * ny) / (nx * nx + ny * ny)) * ny
+                # tx1 = vx1 - nx1
+                # ty1 = vy1 - ny1
+                # tx2 = vx2 - nx2
+                # ty2 = vy2 - ny2
                 #
-                # if p[i].touched >= 5:
-                #     p[i].color = "Red"
-                # if p[j].touched >= 5:
-                #     p[j].color = "Red"
+                # # Change the speed between particles
+                # if tx1 + nx2 != 0:
+                #     p[j].vx = (tx1 + nx2) / math.sqrt(tx1 ** 2 + nx2 ** 2)
+                # if ty1 + ny2 != 0:
+                #     p[j].vy = (ty1 + ny2) / math.sqrt(ty1 ** 2 + ny2 ** 2)
+                # if tx2 + nx1 != 0:
+                #     p[i].vx = (tx2 + nx1) / math.sqrt(tx2 ** 2 + nx1 ** 2)
+                # if ty2 + ny1 != 0:
+                #     p[i].vy = (ty2 + ny1) / math.sqrt(ty2 ** 2 + ny1 ** 2)
+
+                # p[i].xcenter = p[i].xcenter + p[i].vx
+                # p[i].ycenter = p[i].ycenter + p[i].vy
+
+                # 2eme methode
+                # p[i].col(p[j])
+
+                p[j].xcenter = p[j].xcenter + p[j].vx
+                p[j].ycenter = p[j].ycenter + p[j].vy
+
+                p[i].touched += 1
+                p[j].touched += 1
+
+                # Start of relfexion about visualizing the gradient of contact (to modify)
+                if p[i].touched == 1:
+                    p[i].color = "Yellow"
+                if p[j].touched == 1:
+                    p[j].color = "Yellow"
+
+                if p[i].touched > 1:
+                    p[i].color = "Orange"
+                if p[j].touched > 1:
+                    p[j].color = "Orange"
+
+                if p[i].touched >= 5:
+                    p[i].color = "Red"
+                if p[j].touched >= 5:
+                    p[j].color = "Red"
 
                 #####
                 # # Trying to create the collision angle to reset properly the direction

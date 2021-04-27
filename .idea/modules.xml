@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../Bouncing_ball/.idea/Bouncing_ball.iml" filepath="$PROJECT_DIR$/../Bouncing_ball/.idea/Bouncing_ball.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../FouleSimu2/.idea/FouleSimu2.iml" filepath="$PROJECT_DIR$/../FouleSimu2/.idea/FouleSimu2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/crowd_simulation.iml" filepath="$PROJECT_DIR$/.idea/crowd_simulation.iml" />
     </modules>
   </component>
