@@ -133,7 +133,6 @@ def evacuate():
     start = default_timer()  # NEED TO STAY HERE, so as to neglect the initialisation
     deplacement()
 
-
 def screen():
     # Take automatic screenshot
     if 3.0 < double_time < 3.1:
@@ -142,7 +141,6 @@ def screen():
         # ## To modify if you wants to take screens automaticcally into your documents
         # im.save(r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Let pass closest\Evac_Social_Ordered_N' + str(
         # len(ListPart)) + '.png')
-
 
 def refresh():
     ## To update the screen of display
