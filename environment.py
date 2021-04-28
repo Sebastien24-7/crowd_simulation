@@ -1,5 +1,4 @@
 import math
-
 from numpy import *
 import scipy as sp
 import sys
@@ -70,7 +69,7 @@ class Room():
     """
 
     def __init__(self, name='Room', background='White', pixel_size=1.0,
-                 xmin=0.0, width=500,
+                 xmin=0.0, width=1000,
                  ymin=0.0, height=500,
                  wall_colors=[[0, 0, 0]], ):
         """

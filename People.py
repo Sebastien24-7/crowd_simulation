@@ -33,7 +33,7 @@ class People():
         # self.color = random.choice(colors)
         self.color = "#{:06x}".format(random.randint(0, 0xffffff))
         self.xcenter, self.ycenter = [xcenter, ycenter]  # Used for computing distance between particles
-        self.xcoord, self.ycoord = [xcenter - 8, ycenter - 8]  # They are the coordinates of the center of the particle
+        # self.xcoord, self.ycoord = [xcenter - 8, ycenter - 8]  # They are the coordinates of the center of the particle
 
         #### To create a random crowd with every kind of people
         if type == "kid":
@@ -51,8 +51,8 @@ class People():
             self.name = "Adulte"
             self.color = "purple"
         if type == "old":
-            self.xcoord, self.ycoord = [xcenter - 9,
-                                        ycenter - 9]  # They are the coordinates of the center of the particle
+            self.xcoord, self.ycoord = [xcenter - 10,
+                                        ycenter - 10]  # They are the coordinates of the center of the particle
             self.masse = 1.5
             self.speed = 0.7
             self.name = "Ancien"
@@ -142,10 +142,10 @@ class People():
                                   ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
                     [ListObstacles[i].xcenter + ListObstacles[i].radius,
                      ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [0, +(self.vy + self.vx)]
+                    [self.vx, self.vy] = [0, +(self.vy)]
                     self.color = "black"
                 else:
-                    [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                    [self.vx, self.vy] = [0, -(self.vy)]
                     self.color = "black"
 
                 # Left of the Obstacle
@@ -183,6 +183,9 @@ class People():
 
     def col(self, p):
 
+        N = [self.xcenter-p.xcenter, self.ycenter - p.ycenter]
+        alpha = math.tan(N[0]/N[1])
+
         v1 = self.vit
         th1 = self.theta
         v2 = p.vit
@@ -195,8 +198,10 @@ class People():
         v22 = math.sqrt((v1 * math.sin(th1)) ** 2 + (v2 * math.cos(th2)) ** 2)
         # il faut projeter sur le repere xy de l'affichage et modif vx et vy
 
-        self.vx = v11 * math.cos(theta11)
-        self.vy = v11 * math.sin(theta11)
+        self.vx = v11 * ((math.cos(theta11)*math.cos(alpha) - math.sin(theta11)*math.sin(alpha)) + (-math.sin(theta11)*math.cos(alpha)+math.cos(theta11)*math.sin(alpha)))
+        self.vy = v11 * ((-math.sin(theta11)*math.sin(alpha) + math.cos(alpha)*math.cos(theta11)) + (math.cos(theta11)*math.sin(alpha)+math.cos(alpha)*math.sin(theta11)))
 
-        p.vx = v22 * math.sin(theta22)
-        p.vy = v22 * math.sin(theta22)
+        p.vx = v22 * ((math.cos(theta22)*math.cos(alpha) - math.sin(theta22)*math.sin(alpha)) + (-math.sin(theta22)*math.cos(alpha)+math.cos(theta22)*math.sin(alpha)))
+        p.vy = v22 * ((-math.sin(theta22)*math.sin(alpha) + math.cos(alpha)*math.cos(theta22)) + (math.cos(theta22)*math.sin(alpha)+math.cos(alpha)*math.sin(theta22)))
+
+
