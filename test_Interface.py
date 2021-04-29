@@ -6,6 +6,7 @@ from timeit import default_timer
 from tkinter import *
 
 import pyautogui
+import csv
 
 from People import *
 from matplotlib.backends.backend_tkagg import (
@@ -23,7 +24,7 @@ from environment import *
 
 ### VARIABLES
 w_porte = 50
-X_porte = 500
+X_obstacle = 500
 w_obstacle = 50
 part_out = []
 ListPart = []
@@ -82,8 +83,6 @@ chronolabel.grid(row=1, column=1)
 sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
-
-
 #####TRASH##############
 # Not Useful anymore
 
@@ -136,16 +135,15 @@ def evacuate():
     # NEED TO STAY HERE, so as to neglect the initialisation
     deplacement()
 
-
 def screen():
     # Take automatic screenshot
-    if 3.0 < double_time < 3.1:
+    if 5.0 < double_time < 5.1:
         print("It's past 3 seconds")
-        # im = pyautogui.screenshot(region=(150, 80, 500, 500))
-        # ## To modify if you wants to take screens automaticcally into your documents
-        # im.save(r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Let pass closest\Evac_Social_Ordered_N' + str(
-        # len(ListPart)) + '.png')
-
+        im = pyautogui.screenshot(region=(150, 80, 500, 500))
+        ## To modify if you wants to take screens automaticcally into your documents
+        im.save(
+            r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Without_Obst\Hétérogènes\Selfish\Evac_Social_Ordered_N' + str(
+                len(ListPart)) + '.png')
 
 def refresh():
     ## To update the screen of display
@@ -388,28 +386,28 @@ def CreateEnv():
     interface.grid()
     # Create the door
     interface.create_line(20, ((world.height - w_porte) / 2), 20, ((world.height + w_porte) / 2), fill="green", width=5)
-    interface.create_line(X_porte, (world.height / 2 - w_obstacle), X_porte, (world.height / 2 + w_obstacle),
+    interface.create_line(X_obstacle, (world.height / 2 - w_obstacle), X_obstacle, (world.height / 2 + w_obstacle),
                           fill="black",
                           width=5)
+    ## Create the wall
     interface.create_rectangle(0, (world.height / 2 - w_porte), 20, (world.height / 2 + w_porte), fill="green", width=5)
     interface.grid()
 
     ## Add obstacles to the room (they are created in the class Room)
-    # for i in range(len(ListObstacles)):
-    #     # # Just to see if it is working
-    #     # print(ListObstacles[i])
-    #     if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
-    #         interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
-    #                                    (ListObstacles[i].ycenter - ListObstacles[i].radius),
-    #                                    (ListObstacles[i].xcenter + ListObstacles[i].radius),
-    #                                    (ListObstacles[i].ycenter + ListObstacles[i].radius),
-    #                                    fill=ListObstacles[i].color)
-    #     elif ListObstacles[i].shape == "Circle":
-    #         interface.create_oval((ListObstacles[i].xcenter - ListObstacles[i].radius),
-    #                               (ListObstacles[i].ycenter - ListObstacles[i].radius),
-    #                               (ListObstacles[i].xcenter + ListObstacles[i].radius),
-    #                               (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
-
+    for i in range(len(ListObstacles)):
+        ## Just to see if it is working
+        # print(ListObstacles[i])
+        if ListObstacles[i].shape == "Rectangle":  ##can be center + or - 10 but I put radius to generalize
+            interface.create_rectangle((ListObstacles[i].xcenter - ListObstacles[i].radius),
+                                       (ListObstacles[i].ycenter - ListObstacles[i].radius),
+                                       (ListObstacles[i].xcenter + ListObstacles[i].radius),
+                                       (ListObstacles[i].ycenter + ListObstacles[i].radius),
+                                       fill=ListObstacles[i].color)
+        elif ListObstacles[i].shape == "Circle":
+            interface.create_oval((ListObstacles[i].xcenter - ListObstacles[i].radius),
+                                  (ListObstacles[i].ycenter - ListObstacles[i].radius),
+                                  (ListObstacles[i].xcenter + ListObstacles[i].radius),
+                                  (ListObstacles[i].ycenter + ListObstacles[i].radius), fill=ListObstacles[i].color)
 
 # Creation of the Movement
 def deplacement():
@@ -420,7 +418,7 @@ def deplacement():
 
     updateTime()  # So as to get the real time
     CreateEnv()
-    # collision(p)
+    collision(p, BOO)
 
     for i in range(0, len(p)):
 
@@ -475,8 +473,66 @@ def deplacement():
         #             [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
         #             p[i].color = "blue"
 
-        ### MODELE EGOISTE (enlever) LAISSER PASSER (laisser) ###
+        ###FOR ME
+        ## Was used to compute the old speed
+        # p[i].xcenter = p[i].xcenter + p[i].vx
+        # p[i].ycenter = p[i].ycenter + p[i].vy
+
         # ## Check for collisions between the balls ####
+        # for j in range(0, len(ListPart)):
+        #     # Check for collision
+        #     if (p[i].distance_collision(p[j]) <= 20):
+        #         if (p[i].Distance([0, world.height / 2]) <= p[j].Distance([0, world.height / 2])):
+        #             if p[i].xcoord<0:
+        #                 break
+        #             p[i].xcenter = p[i].xcenter + p[i].vx
+        #             p[i].ycenter = p[i].ycenter + p[i].vy
+        #             print(p[i].vy)
+        #             p[j].xcoord = p[j].xcoord  # Stays behind the particle closer to the door
+        #             p[j].ycoord = p[j].ycoord
+        #             # p[i].color = "Red"
+        #             # if p[i].distance_collision(p[j]) > 20:
+        #             #     print("It's finished")
+        #             #     break
+        #         else:
+        #             if p[i].xcenter < 0:
+        #                 break
+        #             p[j].xcenter = p[j].xcenter + p[j].vx
+        #             p[j].ycenter = p[j].ycenter + p[j].vy
+        #             p[i].xcenter = p[i].xcenter
+        #             p[i].ycenter = p[i].ycenter
+        #             p[j].color = "Blue"
+
+        # ### Check for collisions between the balls ####
+        # for j in range(i + 1, len(ListPart)):
+        # #     # Check for collision
+        #     if p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius):
+        #         ### AVEC CES DEUX LIGNES ON RETROUVE UN MODELE SIMPLE DE COLLISION FONCTIONNANT###
+        #         p[i].vx, p[j].vx = p[j].vx, p[i].vx
+        #         p[i].vy, p[j].vy = p[j].vy, p[i].vy
+        #
+        #         p[i].touched += 1
+        #         p[j].touched += 1
+        #         # Start of relfexion about visualizing the gradient of contact (to modify)
+        #         if p[i].touched == 1:
+        #             p[i].color = "Yellow"
+        #         if p[j].touched == 1:
+        #             p[j].color = "Yellow"
+        #         if p[i].touched > 1:
+        #             p[i].color = "Orange"
+        #         if p[j].touched > 1:
+        #             p[j].color = "Orange"
+        #         if p[i].touched >= 5:
+        #             p[i].color = "Red"
+        #         if p[j].touched >= 5:
+        #             p[j].color = "Red"
+        #     else:
+        #         if (p[i].xcenter - p[j].ycenter) > p[i].radius+p[j].radius +30: #Trying to create inertia
+        #             p[j].ComputeTraj([0, height / 2])
+        ###ABOVE FOR ME
+
+        ### MODELE EGOISTE (enlever) LAISSER PASSER (laisser) ###
+        ## Check for collisions between the balls ####
         # for j in range(0, len(ListPart)):
         #     # Check for collision
         #     if (p[i].distance_collision(p[j]) <= p[i].radius + p[j].radius):
@@ -486,7 +542,7 @@ def deplacement():
         #             p[i].xcenter = p[i].xcenter + p[i].vx * dt
         #             p[i].ycenter = p[i].ycenter + p[i].vy * dt
         #             # print(p[i].vy)
-        #             p[j].xcenter = p[j].xcenter  # Stays behind the particle closer to the door
+        #             p[j].xcenter = p[j].xcenter # Stays behind the particle closer to the door
         #             p[j].ycenter = p[j].ycenter
         #             p[i].color = "Red"
         #             if p[i].distance_collision(p[j]) > 20:  # To stop computing when they're afar
@@ -515,7 +571,6 @@ def deplacement():
 
 def suppr():
     interface.delete('all')
-
 
 # GOAL : Create an environnement before the alert
 def chilling():
@@ -632,59 +687,37 @@ def collision(p, bool):
 
         # le mur
         if not bool:
-            if p[i].vx < 0:
-                if X_porte < (p[i].xcenter - p[i].radius) < X_porte + 5:
-                    if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
-                            world.height / 2 + w_obstacle):
-                        if p[i].Distance([X_porte, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                                [X_porte, (world.height / 2 + w_obstacle)]):
-                            [p[i].vx, p[i].vy] = [-p[i].vx, (p[i].vy)]
-                            # [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
-                            p[i].color = "Pink"
-                        else:
-                            [p[i].vx, p[i].vy] = [-p[i].vx, p[i].vy]
-                            # [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
-                            p[i].color = "blue"
-            if p[i].vx > 0:
-                if X_porte - 5 < (p[i].xcenter + p[i].radius) < X_porte:
-                    if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
-                            world.height / 2 + w_obstacle):
-                        if p[i].Distance([X_porte, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                                [X_porte, (world.height / 2 + w_obstacle)]):
-                            [p[i].vx, p[i].vy] = [-p[i].vx, (p[i].vy)]
-                            p[i].color = "Pink"
-                        else:
-                            [p[i].vx, p[i].vy] = [-p[i].vx, (p[i].vy)]
-                            p[i].color = "blue"
+            if (X_obstacle < (p[i].xcenter - p[i].radius) < X_obstacle + 5 and p[i].vx < 0) or (
+                    X_obstacle - 5 < (p[i].xcenter + p[i].radius) < X_obstacle and p[i].vx > 0):
+                if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
+                        world.height / 2 + w_obstacle):
+                    if p[i].Distance([X_obstacle, (world.height / 2 - w_obstacle)]) > p[i].Distance(
+                            [X_obstacle, (world.height / 2 + w_obstacle)]):
+                        [p[i].vx, p[i].vy] = [-p[i].vx, (p[i].vy)]
+                        # [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
+                        p[i].color = "Pink"
+                    else:
+                        [p[i].vx, p[i].vy] = [-p[i].vx, p[i].vy]
+                        # [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
+                        p[i].color = "blue"
         else:
-            if p[i].vx < 0:
-                if X_porte < (p[i].xcenter - p[i].radius) < X_porte + 5:
-                    if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
-                            world.height / 2 + w_obstacle):
-                        if p[i].Distance([X_porte, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                                [X_porte, (world.height / 2 + w_obstacle)]):
-                            [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
-                            p[i].color = "Pink"
-                        else:
-                            [p[i].vx, p[i].vy] = [0, (p[i].vy + p[i].vx)]
-                            p[i].color = "blue"
-            if p[i].vx > 0:
-                if X_porte - 5 < (p[i].xcenter + p[i].radius) < X_porte:
-                    if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
-                            world.height / 2 + w_obstacle):
-                        if p[i].Distance([X_porte, (world.height / 2 - w_obstacle)]) > p[i].Distance(
-                                [X_porte, (world.height / 2 + w_obstacle)]):
-                            [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
-                            p[i].color = "Pink"
-                        else:
-                            [p[i].vx, p[i].vy] = [0, (p[i].vy + p[i].vx)]
-                            p[i].color = "blue"
+            if (X_obstacle < (p[i].xcenter - p[i].radius) < X_obstacle + 5 and p[i].vx < 0) or (
+                    X_obstacle - 5 < (p[i].xcenter + p[i].radius) < X_obstacle and p[i].vx > 0):
+                if (world.height / 2 - w_obstacle) - 20 < (p[i].ycenter - p[i].radius) < (
+                        world.height / 2 + w_obstacle):
+                    if p[i].Distance([X_obstacle, (world.height / 2 - w_obstacle)]) > p[i].Distance(
+                            [X_obstacle, (world.height / 2 + w_obstacle)]):
+                        [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
+                        p[i].color = "Pink"
+                    else:
+                        [p[i].vx, p[i].vy] = [0, (p[i].vy + p[i].vx)]
+                        p[i].color = "blue"
 
         ## So that they still continue to go through the door
         p[i].xcenter = p[i].xcenter + p[i].vx
         p[i].ycenter = p[i].ycenter + p[i].vy
 
-        # collision with all obstacles
+        ## collision with all obstacles
         # p[i].CollisionObstacle2(ListObstacles)
 
         for j in range(i + 1, len(ListPart)):
@@ -814,7 +847,8 @@ def theory():
     N = interface.getvar(name="Nbr_particles")  # Nombre de Particules
     W = w_porte * 2  # Width of the door
     D = (int(N) / (
-            (width * height) / 3779))  # Density of people by meter square (1 meter = 3779 pixels don't from where)
+            (width / 3779) * (
+                height / 3779)))  # Density of people by meter square (1 meter = 3779 pixels don't know from where)
 
     v0 = 1.3  # (m/s) vitesse de marche par défaut et sans effet de foule
     vT = v0 * math.pow(D, -0.8)
@@ -824,18 +858,20 @@ def theory():
         v.append(ListPart[i].speed)
     vAverage = mean(v)
 
-    F = vAverage * W * D  # Flux de personne (débit de pers / sec à l'ouverture)
+    F = vAverage * (W / 3779) * D  # Flux de personne (débit de pers / sec à l'ouverture)
     Fspe = vAverage * D  # Flux de personne (débit spécifique en m^-1.s^-1 )
 
     tevac = []
     L = []
     for i in range(len(ListPart)):
-        L.append(Dsortie)
-        tevac.append((float(N) / (float(Fspe) * float(W))) + (L[i] / vT))  # Temps d'évacuation
+        L.append(Dsortie / 3779)
+        tevac.append(((float(N) / (float(Fspe) * float(W / 3779))) + (
+                    L[i] / vT)) * 10)  # Temps d'évacuation # LE FOIS 10 NE DOIT PAS ETRE LA
 
     t_total = max(tevac)  # Temps total de l'évacuation correspond à la valeur la plus élevée d'évacuation
     print("Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
-
+    example.set("Nombre d'individus :" + interface.getvar(
+        name="Nbr_particles") + '\n' + "Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
 
 # On lance la boucle principale:
 Simulation.mainloop()

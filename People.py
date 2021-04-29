@@ -66,7 +66,7 @@ class People():
         self.angle = 0
         self.vx, self.vy = (self.speed * vx, self.speed * vy)
         self.vit = math.sqrt(vx ** 2 + vy ** 2)
-        self.theta = self.vx / self.vit
+        # self.theta = self.vx / self.vit
         self.good_pos = False
         self.time = 0
 
@@ -133,53 +133,64 @@ class People():
 
             if delta < self.radius + ListObstacles[i].radius:
                 # To detect collision is working
-                self.color = "brown"
+                # self.color = "brown"
 
                 # Interaction with all the sides of the obstacles
 
-                # Right of the Obstacle
-                if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,
-                                  ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                    [ListObstacles[i].xcenter + ListObstacles[i].radius,
-                     ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [0, +(self.vy)]
-                    self.color = "black"
-                else:
-                    [self.vx, self.vy] = [0, -(self.vy)]
-                    self.color = "black"
+                if (ListObstacles[i].ycenter - ListObstacles[i].radius - self.radius) < (self.ycenter) < (
+                        ListObstacles[i].ycenter + ListObstacles[i].radius + self.radius):
+                    # Right of the Obstacle
+                    if self.vx < 0:  # va vers la gauche
+                        # (côté haut est plus loin que celui du bas)
+                        if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,
+                                          ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
+                            [ListObstacles[i].xcenter + ListObstacles[i].radius,
+                             ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                            [self.vx, self.vy] = [0, (self.vy + self.vx)]
+                            self.color = "yellow"
+                        else:
+                            [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                            self.color = "yellow"
 
-                # Left of the Obstacle
-                if self.Distance([ListObstacles[i].xcenter - ListObstacles[i].radius,
-                                  ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                    [ListObstacles[i].xcenter - ListObstacles[i].radius,
-                     ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [0, +(self.vy + self.vx)]
-                    self.color = "black"
-                else:
-                    [self.vx, self.vy] = [0, -(self.vy + self.vx)]
-                    self.color = "black"
+                    # Left of the Obstacle
+                    if self.vx > 0:  # va vers la droite
+                        # (côté haut est plus loin que celui du bas)
+                        if self.Distance([ListObstacles[i].xcenter - ListObstacles[i].radius,
+                                          ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
+                            [ListObstacles[i].xcenter - ListObstacles[i].radius,
+                             ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                            [self.vx, self.vy] = [0, (self.vy + self.vx)]
+                            self.color = "yellow"
+                        else:
+                            [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                            self.color = "yellow"
+                if (ListObstacles[i].xcenter - ListObstacles[i].radius - self.radius) < (self.xcenter) < (
+                        ListObstacles[i].xcenter + ListObstacles[i].radius + self.radius):
+                    ##Top of the obstacle
+                    if self.vy > 0:  # Redescend
+                        # (côté gauche est plus loin que celui de droite)
+                        if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
+                                          ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
+                            [ListObstacles[i].ycenter - ListObstacles[i].radius,
+                             ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                            [self.vx, self.vy] = [-(self.vx + self.vy), 0]
+                            self.color = "blue"
+                        else:
+                            [self.vx, self.vy] = [+(self.vx + self.vy), 0]
+                            self.color = "blue"
 
-                ##Top of the obstacle
-                if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
-                                  ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                    [ListObstacles[i].ycenter - ListObstacles[i].radius,
-                     ListObstacles[i].xcenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [+(self.vy + self.vx), 0]
-                    self.color = "blue"
-                else:
-                    [self.vx, self.vy] = [-(self.vy + self.vx), 0]
-                    self.color = "blue"
-
-                ##Bottom of the obstacle
-                if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
-                                  ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                    [ListObstacles[i].ycenter + ListObstacles[i].radius,
-                     ListObstacles[i].xcenter + ListObstacles[i].radius]):
-                    [self.vx, self.vy] = [+(self.vy + self.vx), 0]
-                    self.color = "blue"
-                else:
-                    [self.vx, self.vy] = [-(self.vy + self.vx), 0]
-                    self.color = "blue"
+                    ##Bottom of the obstacle
+                    if self.vy < 0:  # Remonte
+                        # (côté gauche est plus loin que celui de droite)
+                        if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
+                                          ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
+                            [ListObstacles[i].ycenter + ListObstacles[i].radius,
+                             ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                            [self.vx, self.vy] = [-(self.vx + self.vy), 0]
+                            self.color = "blue"
+                        else:
+                            [self.vx, self.vy] = [+(self.vx + self.vy), 0]
+                            self.color = "blue"
 
     def col(self, p):
 
