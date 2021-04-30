@@ -102,8 +102,8 @@ class Room():
         self.ymax = self.ymin + self.height * pixel_size
         self.ListObstacles = []
 
-        obs = Obstacle("Mur", "Black", "Rectangle", 150, 100)
-        obs1 = Obstacle("Pilier1", "Black", "Circle", 200, 150)
+        obs = Obstacle("Mur", "Black", "Circle", 150, 100)
+        obs1 = Obstacle("Pilier1", "Black", "Rectangle", 150, 200)
         obs2 = Obstacle("Pilier2", "Black", "Circle", 150, 300)
         self.ListObstacles.append(obs)
         self.ListObstacles.append(obs1)

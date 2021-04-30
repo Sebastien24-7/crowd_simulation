@@ -87,6 +87,118 @@ class People():
  \
             ############
 
+    # Creation of the list of people
+    def CreaPart(number, W_width, W_height, crowd_type):
+        my_particles = []
+        possible_types = ["kid", "adult", "old"]
+        for i in range(number):
+            xcenter = (W_width - 200) * random.random() + 100
+            ycenter = (W_height - 200) * random.random() + 100
+
+            # D = [xcenter - coord_sortie[0], ycenter - coord_sortie[1]]
+            # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
+            # print(D)
+
+            # vx = 1 * (coord_sortie[0] - xcenter) / math.sqrt(
+            #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
+            # vy = 1 * (coord_sortie[1] - ycenter) / math.sqrt(
+            #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
+
+            vx = random.random() * 2 - 1
+            vy = random.random() * 2 - 1
+            # vx, vy = [0, 0]
+
+            ### To Produce a Population with various Type
+            if crowd_type == "Hétérogène":
+                ## To produce a Gaussian repartition of the population
+                k = random.random()
+                if k < 0.6:
+                    type = possible_types[1]
+                if 0.6 < k < 0.8:
+                    type = possible_types[0]
+                if 0.8 < k < 1.0:
+                    type = possible_types[2]
+            else:
+                ### Produce a Population with only adults
+                type = possible_types[1]
+
+            p = People(xcenter, ycenter, vx, vy, type)
+
+            my_particles.append(p)
+        return my_particles
+
+    ##Deal with the overlapping at the creation of the particles
+    def CreaCrowd(p, type, W_width, W_height):
+        ### RANDOM CROWD ####
+        for i in range(len(p)):
+            for j in range(len(p)):
+                while True:
+                    p[i].xcenter = (W_width - 100) * random.random() + 50
+                    p[j].xcenter = (W_width - 100) * random.random() + 50
+                    p[i].ycenter = (W_height - 100) * random.random() + 50
+                    p[j].ycenter = (W_height - 100) * random.random() + 50
+                    if (abs(p[i].xcenter - p[j].xcenter) < 40) | (abs(p[i].ycenter - p[i].ycenter) < 40):
+                        break
+
+        # if (str)(interface.getvar(name="crowd_type")) == "Aléatoire":
+        #     for i in range(len(my_particles)):
+        #         # Check it is inside the room (but not functional)
+        #         if my_particles[i].xcenter < (25 - my_particles[i].radius) or my_particles[i].xcenter > (
+        #                 width - 25 + my_particles[i].radius):
+        #             my_particles[i].xcenter = (width - 80) * random.random() + 30
+        #             # print(" I was going outside")
+        #         if my_particles[i].ycenter < (25 - my_particles[i].radius) or my_particles[i].ycenter > (
+        #                 height - 25 + my_particles[i].radius):
+        #             my_particles[i].ycenter = (height - 80) * random.random() + 30
+        #             # print(" I was going outside")
+
+        # if i!=0 and  my_particles[i].distance_collision(my_particles[i-1]) < (my_particles[i].radius + my_particles[i-1].radius):
+        #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
+        #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
+        #     print(" I was going over a friend")
+
+        # # Checking the overlapping between particles
+        # for j in range(len(p)):
+        #     # if my_particles[i].distance_collision(my_particles[j]) < (
+        #     #         my_particles[i].radius + my_particles[j].radius):
+        #     #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
+        #     #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
+        #     #     print(" I was going over a friend")
+        #     #
+        #     #     if my_particles[i].distance_collision(my_particles[j]) < (
+        #     #             my_particles[i].radius + my_particles[j].radius):
+        #     #          print(" I 'm still going over a friend")
+        #     # print("I do my work")
+        #     while my_particles[j].xcenter - my_particles[j].radius <= my_particles[i].xcenter <= my_particles[
+        #         j].xcenter:
+        #         my_particles[i].xcenter -= my_particles[j].radius - 25
+        #         my_particles[i].ycenter -= my_particles[j].radius - 25
+        #     while my_particles[j].xcenter + my_particles[j].radius >= my_particles[i].xcenter >= my_particles[
+        #         j].xcenter:
+        #         my_particles[i].xcenter += my_particles[j].radius + 25
+        #         my_particles[i].ycenter += my_particles[j].radius + 25
+
+        ## ORDERED CROWD ####
+        if type == "Ordonnée":
+
+            # Initialisation des particules sur forme de grille
+            i = 0
+            j = 4
+            for k in range(len(p)):
+                # my_particles[k].vx , my_particles[k].vy = 0 , 0
+                # my_particles[k].xcenter , my_particles[k].ycenter = 40 , 40
+                if 40 * i <= 420:
+                    i = i + 1
+                    p[k].xcenter = 40 * i
+                    p[k].ycenter = 40 * j
+                else:
+                    i = 1
+                    j = j + 1
+                    p[k].xcenter = 40
+                    p[k].ycenter = 40 * j
+
+        return p
+
     def distance_collision(self, particle):
         """
         Determines the distance between of all the particles
@@ -123,7 +235,7 @@ class People():
                           ((coord[1]) - (self.ycenter + self.radius)) ** 2)
         return delta
 
-    def CollisionObstacle2(self, ListObstacles):
+    def CollisionObstacle2(self, ListObstacles, bool):
 
         for i in range(len(ListObstacles)):
 
@@ -133,69 +245,92 @@ class People():
 
             if delta < self.radius + ListObstacles[i].radius:
                 # To detect collision is working
-                # self.color = "brown"
+                if not bool:  # Si chilling les particules rebondissent sur les obstacles
+                    self.color = "brown"
+                    [self.vx, self.vy] = [-self.vx, -(self.vy)]
+                else:
+                    # if (ListObstacles[i].xcenter - ListObstacles[i].radius < (self.xcenter) <ListObstacles[i].xcenter + ListObstacles[i].radius ):
+                    #     if (self.vy < 0 and (self.ycenter-self.radius) > ListObstacles[i].ycenter + ListObstacles[i].radius) or (self.vy > 0 and (self.ycenter+self.radius) < ListObstacles[i].ycenter - ListObstacles[i].radius):
+                    #         if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius, ListObstacles[i].xcenter - ListObstacles[i].radius]) >\
+                    #                 self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                    #             [self.vx, self.vy] = [-(self.vy + self.vx), 0]
+                    #         else :
+                    #             [self.vx, self.vy] = [+(self.vy + self.vx), 0]
+                    #
+                    # if (ListObstacles[i].ycenter - ListObstacles[i].radius < (self.ycenter) < ListObstacles[i].ycenter + ListObstacles[i].radius):
+                    #     if (self.vx < 0 and (self.xcenter-self.radius) > ListObstacles[i].xcenter + ListObstacles[i].radius) or (self.vx > 0 and (self.xcenter+self.radius) < ListObstacles[i].xcenter - ListObstacles[i].radius):
+                    #         if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius, ListObstacles[i].ycenter - ListObstacles[i].radius]) \
+                    #                 > self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                    #             [self.vx, self.vy] = [0, +(self.vy + self.vx)]
+                    #         else:
+                    #             [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                    #
+                    #     # Interaction with all the sides of the obstacles
 
-                # Interaction with all the sides of the obstacles
+                    if (ListObstacles[i].ycenter - ListObstacles[i].radius - self.radius) < (self.ycenter) < (
+                            ListObstacles[i].ycenter + ListObstacles[i].radius + self.radius):
+                        # Right of the Obstacle
+                        if self.vx < 0 and (self.xcenter) > (
+                                ListObstacles[i].xcenter + ListObstacles[i].radius + self.radius):  # va vers la gauche
+                            # (côté haut est plus loin que celui du bas)
+                            if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,
+                                              ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
+                                [ListObstacles[i].xcenter + ListObstacles[i].radius,
+                                 ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                                [self.vx, self.vy] = [0, (self.vy + self.vx)]
+                                self.color = "yellow"
+                            else:
+                                [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                                self.color = "yellow"
 
-                if (ListObstacles[i].ycenter - ListObstacles[i].radius - self.radius) < (self.ycenter) < (
-                        ListObstacles[i].ycenter + ListObstacles[i].radius + self.radius):
-                    # Right of the Obstacle
-                    if self.vx < 0:  # va vers la gauche
-                        # (côté haut est plus loin que celui du bas)
-                        if self.Distance([ListObstacles[i].xcenter + ListObstacles[i].radius,
-                                          ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                            [ListObstacles[i].xcenter + ListObstacles[i].radius,
-                             ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                            [self.vx, self.vy] = [0, (self.vy + self.vx)]
-                            self.color = "yellow"
-                        else:
-                            [self.vx, self.vy] = [0, -(self.vy + self.vx)]
-                            self.color = "yellow"
+                        # Left of the Obstacle
+                        if self.vx > 0 and (self.xcenter) < (
+                                ListObstacles[i].xcenter - ListObstacles[i].radius - self.radius):  # va vers la droite
+                            # (côté haut est plus loin que celui du bas)
+                            if self.Distance([ListObstacles[i].xcenter - ListObstacles[i].radius,
+                                              ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
+                                [ListObstacles[i].xcenter - ListObstacles[i].radius,
+                                 ListObstacles[i].ycenter + ListObstacles[i].radius]):
+                                [self.vx, self.vy] = [0, (self.vy + self.vx)]
+                                self.color = "yellow"
+                            else:
+                                [self.vx, self.vy] = [0, -(self.vy + self.vx)]
+                                self.color = "yellow"
 
-                    # Left of the Obstacle
-                    if self.vx > 0:  # va vers la droite
-                        # (côté haut est plus loin que celui du bas)
-                        if self.Distance([ListObstacles[i].xcenter - ListObstacles[i].radius,
-                                          ListObstacles[i].ycenter - ListObstacles[i].radius]) > self.Distance(
-                            [ListObstacles[i].xcenter - ListObstacles[i].radius,
-                             ListObstacles[i].ycenter + ListObstacles[i].radius]):
-                            [self.vx, self.vy] = [0, (self.vy + self.vx)]
-                            self.color = "yellow"
-                        else:
-                            [self.vx, self.vy] = [0, -(self.vy + self.vx)]
-                            self.color = "yellow"
-                if (ListObstacles[i].xcenter - ListObstacles[i].radius - self.radius) < (self.xcenter) < (
-                        ListObstacles[i].xcenter + ListObstacles[i].radius + self.radius):
-                    ##Top of the obstacle
-                    if self.vy > 0:  # Redescend
-                        # (côté gauche est plus loin que celui de droite)
-                        if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
-                                          ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                            [ListObstacles[i].ycenter - ListObstacles[i].radius,
-                             ListObstacles[i].xcenter + ListObstacles[i].radius]):
-                            [self.vx, self.vy] = [-(self.vx + self.vy), 0]
-                            self.color = "blue"
-                        else:
-                            [self.vx, self.vy] = [+(self.vx + self.vy), 0]
-                            self.color = "blue"
+                    if (ListObstacles[i].xcenter - ListObstacles[i].radius - self.radius) < (self.xcenter) < (
+                            ListObstacles[i].xcenter + ListObstacles[i].radius + self.radius):
+                        ##Top of the obstacle
+                        if self.vy > 0 and (self.ycenter) < (
+                                ListObstacles[i].ycenter - ListObstacles[i].radius - self.radius):  # Redescend
+                            # (côté gauche est plus loin que celui de droite)
+                            if self.Distance([ListObstacles[i].ycenter - ListObstacles[i].radius,
+                                              ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
+                                [ListObstacles[i].ycenter - ListObstacles[i].radius,
+                                 ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                                [self.vx, self.vy] = [-(self.vx + self.vy), 0]
+                                self.color = "blue"
+                            else:
+                                [self.vx, self.vy] = [+(self.vx + self.vy), 0]
+                                self.color = "blue"
 
-                    ##Bottom of the obstacle
-                    if self.vy < 0:  # Remonte
-                        # (côté gauche est plus loin que celui de droite)
-                        if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
-                                          ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
-                            [ListObstacles[i].ycenter + ListObstacles[i].radius,
-                             ListObstacles[i].xcenter + ListObstacles[i].radius]):
-                            [self.vx, self.vy] = [-(self.vx + self.vy), 0]
-                            self.color = "blue"
-                        else:
-                            [self.vx, self.vy] = [+(self.vx + self.vy), 0]
-                            self.color = "blue"
+                        ##Bottom of the obstacle
+                        if self.vy < 0 and (self.ycenter) > (
+                                ListObstacles[i].ycenter + ListObstacles[i].radius + self.radius):  # Remonte
+                            # (côté gauche est plus loin que celui de droite)
+                            if self.Distance([ListObstacles[i].ycenter + ListObstacles[i].radius,
+                                              ListObstacles[i].xcenter - ListObstacles[i].radius]) > self.Distance(
+                                [ListObstacles[i].ycenter + ListObstacles[i].radius,
+                                 ListObstacles[i].xcenter + ListObstacles[i].radius]):
+                                [self.vx, self.vy] = [-(self.vx + self.vy), 0]
+                                self.color = "blue"
+                            else:
+                                [self.vx, self.vy] = [+(self.vx + self.vy), 0]
+                                self.color = "blue"
 
     def col(self, p):
 
-        N = [self.xcenter-p.xcenter, self.ycenter - p.ycenter]
-        alpha = math.tan(N[0]/N[1])
+        N = [self.xcenter - p.xcenter, self.ycenter - p.ycenter]
+        alpha = math.tan(N[0] / N[1])
 
         v1 = self.vit
         th1 = self.theta

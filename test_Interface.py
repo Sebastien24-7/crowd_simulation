@@ -8,7 +8,6 @@ from tkinter import *
 import pyautogui
 import csv
 
-from People import *
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -18,9 +17,9 @@ from environment import *
 import numpy as np
 from matplotlib import pyplot as plt
 
-##SETUP
-# On cree une fenetre et un canevas:
+from People import *
 from environment import *
+from theory import theory
 
 ### VARIABLES
 w_porte = 50
@@ -35,8 +34,13 @@ Dsortie = 0.0
 start = 0.0
 str_time = ''
 double_time = 0.0
+timeTheory = 0.0
+t_sortie = 0.0
 dt = 0.01
 BOO = False
+
+##SETUP
+# On cree une fenetre et un canevas:
 
 Simulation = Tk()
 Simulation.title("Crowd Simulation")
@@ -67,7 +71,11 @@ result = StringVar(Frame2, name="result")
 result.set('Nombre de Particules sorties :')
 
 crowd_selec = StringVar(Frame2, name="crowd_selec")
-crowd_selec.set('Choisissez le type de Population :')
+crowd_selec.set('Choisissez la position de la Population :')
+crowd_setup = StringVar(Frame2, name="crowd_setup", value="1")  # Value =1 enables to unchecked the radiobutton
+
+crowd_selec2 = StringVar(Frame2, name="crowd_selec2")
+crowd_selec2.set('Choisissez le type de Population :')
 crowd_type = StringVar(Frame2, name="crowd_type", value="1")  # Value =1 enables to unchecked the radiobutton
 
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
@@ -83,6 +91,7 @@ chronolabel.grid(row=1, column=1)
 sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
+
 #####TRASH##############
 # Not Useful anymore
 
@@ -92,20 +101,26 @@ def graph():
     l = 0
     k = 0
     j = 0
-    for i in range(0, len(ListPart)):
-        if ListPart[i].name == "Enfant":
-            k = k + 1
-        if ListPart[i].name == "Adulte":
-            j = j + 1
-        if ListPart[i].name == "Ancien":
-            l = l + 1
-    print(k)
-    t = ("Enfant", "Adulte", "Ancien")
-    Y = (k, j, l)
-    fig.add_subplot(111).plot(t, Y)
-    canvas = FigureCanvasTkAgg(fig, master=Simulation)  # A tk.DrawingArea.
-    canvas.draw()
-    canvas.get_tk_widget().grid(row=1, column=2)
+
+    if (str)(interface.getvar(name="crowd_type")) == "Hétérogène":
+        for i in range(0, len(ListPart)):
+            if ListPart[i].name == "Enfant":
+                k = k + 1
+            if ListPart[i].name == "Adulte":
+                j = j + 1
+            if ListPart[i].name == "Ancien":
+                l = l + 1
+        print(k)
+        t = ("Enfant", "Adulte", "Ancien")
+        Y = (k, j, l)
+        fig.add_subplot(111).plot(t, Y)
+        canvas = FigureCanvasTkAgg(fig, master=Simulation)  # A tk.DrawingArea.
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=2)
+    else:
+        pass
+        ## Because in this case we have a pop which is Homogeneous
+
 
 # Function to display some data
 def lancer():
@@ -115,9 +130,10 @@ def lancer():
     interface.setvar(name="Nbr_particles", value=sp.get())
     example.set("Nombre d'individus :" + interface.getvar(name="Nbr_particles"))
     print("Nombre d'individus", interface.getvar(name="Nbr_particles"))
-    particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))
+    particles = People.CreaPart((int)(interface.getvar(name="Nbr_particles")), world.width, world.height,
+                                (str)(interface.getvar(name="crowd_type")))
 
-    ListPart = CreaCrowd(particles)
+    ListPart = People.CreaCrowd(particles, (str)(interface.getvar(name="crowd_setup")), world.width, world.height)
     chilling()  # Particles move in every direction
     graph()
     # # Get the real value of the number of particles
@@ -135,23 +151,37 @@ def evacuate():
     # NEED TO STAY HERE, so as to neglect the initialisation
     deplacement()
 
+
 def screen():
     # Take automatic screenshot
     if 5.0 < double_time < 5.1:
         print("It's past 3 seconds")
-        im = pyautogui.screenshot(region=(150, 80, 500, 500))
+        im = pyautogui.screenshot(region=(5, 80, (world.width / 2), world.height))
         ## To modify if you wants to take screens automaticcally into your documents
         im.save(
             r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Without_Obst\Hétérogènes\Selfish\Evac_Social_Ordered_N' + str(
                 len(ListPart)) + '.png')
 
+
+def screenShoot():
+    print("I took a screen at :" + str(double_time))
+    im = pyautogui.screenshot(region=(5, 80, (world.width / 2), world.height))
+    ## To modify if you wants to take screens automaticcally into your documents
+    im.save(
+        r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Without_Obst\Hétérogènes\Selfish\Evac_Social_Ordered_N' + str(
+            len(ListPart)) + '_manual' + '.png')
+
+
 def refresh():
     ## To update the screen of display
+
+    global timeTheory
+
     interface.setvar(name="Nbr_part_out", value=len(part_out))
     result.set("Nombre d'individus sorties :" + (str)(
         interface.getvar(name="Nbr_part_out")))  # Don't know why we need to concatenate
     print("Nombre d'individus sorties :", interface.getvar(name="Nbr_part_out"))
-    theory()
+    timeTheory = theory(interface.getvar(name="Nbr_particles"), w_porte, world.width, world.height, ListPart, Dsortie)
 
     ###Doesn't Work....####
     # fig1 = Figure()
@@ -180,42 +210,52 @@ def refresh():
     # canvas = FigureCanvasTkAgg(fig1, master=Simulation)  # A tk.DrawingArea.
     # canvas.draw()
     # canvas.get_tk_widget().grid(row=1, column=2)
-    #
+
+    ### This part can be useful don't erase it : Shows how to write in an external document
     # with open('test.csv','w',newline='') as f :
     #     for i in range(len(X)):
     #         writer = csv.writer(f)
     #         writer.writerows(Tab)
 
+
 def select():
+    print(crowd_setup.get())
     print(crowd_type.get())
 
 
 ##Creation of RadioButton to select how to study the room evacuation :
 crowdlabel = Label(Frame2, textvariable=crowd_selec)
-R1 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
-R2 = Radiobutton(Frame2, text="Population Aléatoire", variable=crowd_type, value="Aléatoire", command=select)
+Rpos1 = Radiobutton(Frame2, text="Population Ordonnée", variable=crowd_setup, value="Ordonnée", command=select)
+Rpos2 = Radiobutton(Frame2, text="Population Aléatoire", variable=crowd_setup, value="Aléatoire", command=select)
 crowdlabel.grid(row=4, column=0)
-R1.grid(row=4, column=1, padx=(10, 0))
-R2.grid(row=4, column=2)
+Rpos1.grid(row=4, column=1, padx=(10, 0))
+Rpos2.grid(row=4, column=2)
+
+crowdlabel2 = Label(Frame2, textvariable=crowd_selec2)
+Rtype1 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
+Rtype2 = Radiobutton(Frame2, text="Population Hétérogène", variable=crowd_type, value="Hétérogène", command=select)
+crowdlabel2.grid(row=5, column=0)
+Rtype1.grid(row=5, column=1, padx=(10, 0))
+Rtype2.grid(row=5, column=2)
 
 # Creation of a Button "Launch":
 Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer, activebackground="RED")
-Bouton_Lancer.grid(row=5, column=0)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=6, column=0)  # We add the button to the display of interface tk
 
 # Creation of a Button "Evacuate":
 Bouton_Lancer = Button(Frame2, text='Evacuer', command=evacuate, activebackground="RED")
-Bouton_Lancer.grid(row=5, column=1)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=6, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
 Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=refresh, activebackground="RED")
-Bouton_Refresh.grid(row=5, column=2)  # We add the button to the display of interface tk
+Bouton_Refresh.grid(row=6, column=2)  # We add the button to the display of interface tk
 
 Bouton_Graph = Button(Frame2, text='Graphique', command=graph, activebackground="RED")
-Bouton_Graph.grid(row=6, column=1)  # We add the button to the display of interface tk
+Bouton_Graph.grid(row=7, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
-Bouton_Screen = Button(Frame2, text='Screenshot', command=screen, activebackground="RED")
-Bouton_Screen.grid(row=6, column=0)  # We add the button to the display of interface tk
+Bouton_Screen = Button(Frame2, text='Screenshot', command=screenShoot, activebackground="RED")
+Bouton_Screen.grid(row=7, column=0)  # We add the button to the display of interface tk
 
 
 ###########
@@ -236,7 +276,6 @@ def updateTime():
 
     chronolabel.after(1000, updateTime)
 
-
 # define the countdown func. (so as to count the number of people getting out in a limited amount of time
 def countdown(t):
     while t:
@@ -254,114 +293,6 @@ def countdown(t):
 #
 # # function call
 # countdown(int(t))
-
-# Creation of the list of people
-def CreaPart(number):
-    my_particles = []
-    possible_types = ["kid", "adult", "old"]
-    for i in range(0, number):
-        xcenter = (world.width - 200) * random.random() + 100
-        ycenter = (world.height - 200) * random.random() + 100
-
-        # D = [xcenter - coord_sortie[0], ycenter - coord_sortie[1]]
-        # D_norm=D/math.sqrt((xcoord - coord_sortie[0]) ** 2 + (ycoord - coord_sortie[1]) ** 2)
-        # print(D)
-
-        # vx = 1 * (coord_sortie[0] - xcenter) / math.sqrt(
-        #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
-        # vy = 1 * (coord_sortie[1] - ycenter) / math.sqrt(
-        #     (xcenter - coord_sortie[0]) ** 2 + (ycenter - coord_sortie[1]) ** 2)
-
-        vx = random.random() * 2 - 1
-        vy = random.random() * 2 - 1
-        # vx, vy = [0, 0]
-
-        ## To produce a Gaussian repartition of the population
-        k = random.random()
-        if k < 0.6:
-            type = possible_types[1]
-        if 0.6 < k < 0.8:
-            type = possible_types[0]
-        if 0.8 < k < 1.0:
-            type = possible_types[2]
-
-        p = People(xcenter, ycenter, vx, vy, type)
-
-        my_particles.append(p)
-    return my_particles
-
-
-##Deal with the overlapping at the creation of the particles
-def CreaCrowd(p):
-    ### RANDOM CROWD ####
-    for i in range(0, len(p)):
-        for j in range(0, len(p)):
-            while True:
-                p[i].xcenter = (world.width - 100) * random.random() + 50
-                p[j].xcenter = (world.width - 100) * random.random() + 50
-                p[i].ycenter = (world.height - 100) * random.random() + 50
-                p[j].ycenter = (world.height - 100) * random.random() + 50
-                if (abs(p[i].xcenter - p[j].xcenter) < 40) | (abs(p[i].ycenter - p[i].ycenter) < 40):
-                    break
-
-    # if (str)(interface.getvar(name="crowd_type")) == "Aléatoire":
-    #     for i in range(len(my_particles)):
-    #         # Check it is inside the room (but not functional)
-    #         if my_particles[i].xcenter < (25 - my_particles[i].radius) or my_particles[i].xcenter > (
-    #                 width - 25 + my_particles[i].radius):
-    #             my_particles[i].xcenter = (width - 80) * random.random() + 30
-    #             # print(" I was going outside")
-    #         if my_particles[i].ycenter < (25 - my_particles[i].radius) or my_particles[i].ycenter > (
-    #                 height - 25 + my_particles[i].radius):
-    #             my_particles[i].ycenter = (height - 80) * random.random() + 30
-    #             # print(" I was going outside")
-
-    # if i!=0 and  my_particles[i].distance_collision(my_particles[i-1]) < (my_particles[i].radius + my_particles[i-1].radius):
-    #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
-    #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
-    #     print(" I was going over a friend")
-
-    # # Checking the overlapping between particles
-    # for j in range(len(p)):
-    #     # if my_particles[i].distance_collision(my_particles[j]) < (
-    #     #         my_particles[i].radius + my_particles[j].radius):
-    #     #     my_particles[i].xcenter = (world.width - 50) * random.random() + 30
-    #     #     my_particles[i].ycenter = (world.height - 50) * random.random() + 30
-    #     #     print(" I was going over a friend")
-    #     #
-    #     #     if my_particles[i].distance_collision(my_particles[j]) < (
-    #     #             my_particles[i].radius + my_particles[j].radius):
-    #     #          print(" I 'm still going over a friend")
-    #     # print("I do my work")
-    #     while my_particles[j].xcenter - my_particles[j].radius <= my_particles[i].xcenter <= my_particles[
-    #         j].xcenter:
-    #         my_particles[i].xcenter -= my_particles[j].radius - 25
-    #         my_particles[i].ycenter -= my_particles[j].radius - 25
-    #     while my_particles[j].xcenter + my_particles[j].radius >= my_particles[i].xcenter >= my_particles[
-    #         j].xcenter:
-    #         my_particles[i].xcenter += my_particles[j].radius + 25
-    #         my_particles[i].ycenter += my_particles[j].radius + 25
-
-    ## ORDERED CROWD ####
-    if (str)(interface.getvar(name="crowd_type")) == "Homogène":
-
-        # Initialisation des particules sur forme de grille
-        i = 0
-        j = 4
-        for k in range(0, len(p)):
-            # my_particles[k].vx , my_particles[k].vy = 0 , 0
-            # my_particles[k].xcenter , my_particles[k].ycenter = 40 , 40
-            if 40 * i <= 420:
-                i = i + 1
-                p[k].xcenter = 40 * i
-                p[k].ycenter = 40 * j
-            else:
-                i = 1
-                j = j + 1
-                p[k].xcenter = 40
-                p[k].ycenter = 40 * j
-
-    return p
 
 
 # Compute and give the adapted speed for the particles to reach the door
@@ -413,9 +344,10 @@ def CreateEnv():
 def deplacement():
     interface.delete('all')
 
+    global t_sortie
+
     p = ListPart
     # ComputeTraject(p)
-
     updateTime()  # So as to get the real time
     CreateEnv()
     collision(p, BOO)
@@ -562,15 +494,29 @@ def deplacement():
 
     # Stop the code if everyone is out
     if len(part_out) == len(p):
-        print("Everyone is out of the room")
+
+        if t_sortie == 0.0:  # Afin de n'avoir qu'une seule fois le temps final et pas de mise à jour
+            t_sortie = double_time
+
         print("And all of them get out in " + (str)(str_time) + "seconds and to be more precise :" + str(
-            double_time) + "seconds")
-        refresh()
-        exit()
+            t_sortie) + "seconds")
+
+        refresh()  ## Définit le timeTheory
+
+        example.set(
+            "Tout le monde est sorti, avec N =" + str(interface.getvar(name="Nbr_particles")) + '\n'  "| Type =" + (
+                str)(interface.getvar(name="crowd_type")) + " | Setup =" + (str)(interface.getvar(name="crowd_setup"))
+            + '\n' "En " + str(t_sortie) + "seconds")
+        result.set("Nombre d'individus sorties :" + str(interface.getvar(name="Nbr_part_out"))
+                   + '\n' "Temps total théorique nécessaire pour sortir : " '\n' + str(timeTheory) + "secondes")
+        Frame2.update()
+
+        # exit()
 
 
 def suppr():
     interface.delete('all')
+
 
 # GOAL : Create an environnement before the alert
 def chilling():
@@ -583,7 +529,6 @@ def chilling():
     collision(p, BOO)
 
     for i in range(0, len(p)):
-
         b = interface.create_oval((p[i].xcenter - p[i].radius), (p[i].ycenter - p[i].radius),
                                   (p[i].xcenter + p[i].radius), (p[i].ycenter + p[i].radius), fill=p[i].color)
         interface.create_line(p[i].xcenter, p[i].ycenter, p[i].xcenter + p[i].radius * p[i].vx,
@@ -693,10 +638,10 @@ def collision(p, bool):
                         world.height / 2 + w_obstacle):
                     if p[i].Distance([X_obstacle, (world.height / 2 - w_obstacle)]) > p[i].Distance(
                             [X_obstacle, (world.height / 2 + w_obstacle)]):
-                        [p[i].vx, p[i].vy] = [-p[i].vx, (p[i].vy)]
+                        [p[i].vx, p[i].vy] = [-p[i].vx, p[i].vy]
                         # [p[i].vx, p[i].vy] = [0, -(p[i].vy + p[i].vx)]
                         p[i].color = "Pink"
-                    else:
+                    else:  ### Fais rebondir dans les deux cas
                         [p[i].vx, p[i].vy] = [-p[i].vx, p[i].vy]
                         # [p[i].vx, p[i].vy] = [0, +(p[i].vy + p[i].vx)]
                         p[i].color = "blue"
@@ -718,12 +663,13 @@ def collision(p, bool):
         p[i].ycenter = p[i].ycenter + p[i].vy
 
         ## collision with all obstacles
-        # p[i].CollisionObstacle2(ListObstacles)
+        p[i].CollisionObstacle2(ListObstacles, bool)
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
             # if dans_la_porte==0:
-            if (p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius)) & (p[j].distance_collision(p[i]) < (p[j].radius + p[i].radius)):
+            if (p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius)) & (
+                    p[j].distance_collision(p[i]) < (p[j].radius + p[i].radius)):
                 ### AVEC CES DEUX LIGNES ON RETROUVE UN MODELE SIMPLE DE COLLISION FONCTIONNANT###
                 p[i].vx, p[j].vx = p[j].vx, p[i].vx
                 p[i].vy, p[j].vy = p[j].vy, p[i].vy
@@ -832,46 +778,6 @@ def collision(p, bool):
             # else:
         #     if (p[i].xcenter - p[j].ycenter) > p[i].radius+p[j].radius +30: #Trying to create inertia
         #         # p[j].ComputeTraj([0, height / 2])
-
-
-##### Old Version to use to work
-
-#     particles = CreaPart((int)(interface.getvar(name="Nbr_particles")))  # The idea after is to put here interface.getvar(name="Nbr_particles") to obtain the real value entered by the user
-#     print("It works hereeeee")
-#     ListPart = CreaCrowd(particles)
-#     deplacement() #Take off the comment to simplify
-
-
-def theory():
-    ### MODELE DE TOGAWA ###
-    N = interface.getvar(name="Nbr_particles")  # Nombre de Particules
-    W = w_porte * 2  # Width of the door
-    D = (int(N) / (
-            (width / 3779) * (
-                height / 3779)))  # Density of people by meter square (1 meter = 3779 pixels don't know from where)
-
-    v0 = 1.3  # (m/s) vitesse de marche par défaut et sans effet de foule
-    vT = v0 * math.pow(D, -0.8)
-
-    v = []  # speed of the individuals
-    for i in range(len(ListPart)):
-        v.append(ListPart[i].speed)
-    vAverage = mean(v)
-
-    F = vAverage * (W / 3779) * D  # Flux de personne (débit de pers / sec à l'ouverture)
-    Fspe = vAverage * D  # Flux de personne (débit spécifique en m^-1.s^-1 )
-
-    tevac = []
-    L = []
-    for i in range(len(ListPart)):
-        L.append(Dsortie / 3779)
-        tevac.append(((float(N) / (float(Fspe) * float(W / 3779))) + (
-                    L[i] / vT)) * 10)  # Temps d'évacuation # LE FOIS 10 NE DOIT PAS ETRE LA
-
-    t_total = max(tevac)  # Temps total de l'évacuation correspond à la valeur la plus élevée d'évacuation
-    print("Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
-    example.set("Nombre d'individus :" + interface.getvar(
-        name="Nbr_particles") + '\n' + "Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
 
 # On lance la boucle principale:
 Simulation.mainloop()
