@@ -25,11 +25,14 @@ from theory import theory
 w_porte = 50
 X_obstacle = 500
 w_obstacle = 50
+parameters = [
+    ""]  # Will contains [Nbr particules, Nbr part_out, Temps d'evac, Temps Théorique, Type Pop, Setup Pop, Position Obstacle x puis y]
 part_out = []
 ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
 ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
+coord_obstacle = [X_obstacle, world.height / 2]
 Dsortie = 0.0
 start = 0.0
 str_time = ''
@@ -69,31 +72,33 @@ example = StringVar(Frame2, name="example")
 example.set('Choisissez le Nombre de Particules :')
 result = StringVar(Frame2, name="result")
 result.set('Nombre de Particules sorties :')
+varDisplay = StringVar(Frame2, name="varDisplay")
 
 crowd_selec = StringVar(Frame2, name="crowd_selec")
 crowd_selec.set('Choisissez la position de la Population :')
-crowd_setup = StringVar(Frame2, name="crowd_setup", value="1")  # Value =1 enables to unchecked the radiobutton
+crowd_setup = StringVar(Frame2, name="crowd_setup", value="Aléatoire")  # Value =1 enables to unchecked the radiobutton
 
 crowd_selec2 = StringVar(Frame2, name="crowd_selec2")
 crowd_selec2.set('Choisissez le type de Population :')
-crowd_type = StringVar(Frame2, name="crowd_type", value="1")  # Value =1 enables to unchecked the radiobutton
+crowd_type = StringVar(Frame2, name="crowd_type", value="Homogène")  # Value =1 enables to unchecked the radiobutton
 
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
 Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
+## Label d'affichage et setup de leur positions
 examplelabel = Label(Frame2, textvariable=example, width=52)
 resultlabel = Label(Frame2, textvariable=result)
 chronolabel = Label(Frame2, text="TEMPS", fg="black", font="Verdana 15 bold")
+varialabel = Label(Frame2, textvariable=varDisplay, font="Verdana 8 bold")
+
 examplelabel.grid(row=2, column=1)
 resultlabel.grid(row=3, column=1)
 chronolabel.grid(row=1, column=1)
+varialabel.grid(row=1, column=0)
 
 sp = Spinbox(Frame2, from_=0, to_=100, width=10)
 sp.grid(row=2, column=2)
 
-
-#####TRASH##############
-# Not Useful anymore
 
 def graph():
     fig = Figure()
@@ -145,12 +150,18 @@ def lancer():
 def evacuate():
     ## Create an alert and makes everyone move towards the exit
     global start
-    start = default_timer()
     global BOO
-    BOO = True
-    # NEED TO STAY HERE, so as to neglect the initialisation
-    deplacement()
 
+    start = default_timer()
+    BOO = True  # States that the evacuation is occurring
+
+    # Launch the evacuation
+    deplacement()
+    # Display some parameters
+    varDisplay.set("Paramètres : " + '\n' "- Position de l'obstacle (x,y) : " + str(X_obstacle) + ' , ' + str(
+        (int)(world.height / 2))
+                   + '\n'  "| Type =" + (str)(interface.getvar(name="crowd_type")) + " | Setup =" + (str)(
+        interface.getvar(name="crowd_setup")))
 
 def screen():
     # Take automatic screenshot
@@ -165,7 +176,7 @@ def screen():
 
 def screenShoot():
     print("I took a screen at :" + str(double_time))
-    im = pyautogui.screenshot(region=(5, 80, (world.width / 2), world.height))
+    im = pyautogui.screenshot(region=(5, 80, (world.width / 2), world.height + 70))
     ## To modify if you wants to take screens automaticcally into your documents
     im.save(
         r'C:\Users\sebas\Documents\INSA\3A\S2\PST\Screens_Modele\Without_Obst\Hétérogènes\Selfish\Evac_Social_Ordered_N' + str(
@@ -498,18 +509,33 @@ def deplacement():
         if t_sortie == 0.0:  # Afin de n'avoir qu'une seule fois le temps final et pas de mise à jour
             t_sortie = double_time
 
+            ### Writing of the parameters in Tab
+            parameters.extend([
+                str(interface.getvar(name="Nbr_particles")), str(interface.getvar(name="Nbr_part_out")),
+                str(t_sortie), str(timeTheory),
+                str(interface.getvar(name="crowd_type")), str(interface.getvar(name="crowd_setup")),
+                str(coord_obstacle[0]), str(coord_obstacle[1])
+            ])
+            with open('test.csv', 'w', newline='\r\n') as f:
+                # for i in range(len(parameters)):
+                #   writer.writerow(parameters[i])
+                writer = csv.writer(f)
+                writer.writerow((parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                                 parameters[5], parameters[6], parameters[7], parameters[8]))
+
+            ####
+
         print("And all of them get out in " + (str)(str_time) + "seconds and to be more precise :" + str(
             t_sortie) + "seconds")
 
         refresh()  ## Définit le timeTheory
 
         example.set(
-            "Tout le monde est sorti, avec N =" + str(interface.getvar(name="Nbr_particles")) + '\n'  "| Type =" + (
-                str)(interface.getvar(name="crowd_type")) + " | Setup =" + (str)(interface.getvar(name="crowd_setup"))
+            "Tout le monde est sorti, avec N =" + str(interface.getvar(name="Nbr_particles"))
             + '\n' "En " + str(t_sortie) + "seconds")
         result.set("Nombre d'individus sorties :" + str(interface.getvar(name="Nbr_part_out"))
                    + '\n' "Temps total théorique nécessaire pour sortir : " '\n' + str(timeTheory) + "secondes")
-        Frame2.update()
+        Frame2.update()  # To refresh the display and see the changes
 
         # exit()
 
@@ -573,7 +599,7 @@ def chilling():
 
 def collision(p, bool):
     ### Check for collisions between the balls ####
-    for i in range(0, len(p)):
+    for i in range(len(p)):
         dans_la_porte = (p[i].xcenter - p[i].radius) < 50 & (
                 (world.height / 2 - w_porte) < p[i].ycenter < (world.height / 2 + w_porte))
         dans_la_salle = (p[i].ycenter + p[i].radius < world.height - 25) | (p[i].ycenter - p[i].radius > 25) | (
@@ -662,12 +688,15 @@ def collision(p, bool):
         p[i].xcenter = p[i].xcenter + p[i].vx
         p[i].ycenter = p[i].ycenter + p[i].vy
 
-        ## collision with all obstacles
-        p[i].CollisionObstacle2(ListObstacles, bool)
+
 
         for j in range(i + 1, len(ListPart)):
             # Check for collision
             # if dans_la_porte==0:
+
+            ## collision with all obstacles
+            p[i].CollisionObstacle2(ListObstacles, bool)  # , p[j].CollisionObstacle2(ListObstacles, bool)
+
             if (p[i].distance_collision(p[j]) < (p[i].radius + p[j].radius)) & (
                     p[j].distance_collision(p[i]) < (p[j].radius + p[i].radius)):
                 ### AVEC CES DEUX LIGNES ON RETROUVE UN MODELE SIMPLE DE COLLISION FONCTIONNANT###
