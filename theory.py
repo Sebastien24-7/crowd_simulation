@@ -56,6 +56,7 @@ def theory(N, w_porte, W_width, W_height, ListParticles, Dsortie):
 
     t_total = double(
         "{:.2f}".format(max(tevac)))  # Temps total de l'évacuation correspond à la valeur la plus élevée d'évacuation
+
     print("Temps total théorique nécessaire pour sortir : " + str(t_total) + "secondes")
     # result.set("Nombre d'individus sorties :", str(interface.getvar(name="Nbr_part_out"))
     #            + '\n' "Temps total théorique nécessaire pour sortir : " '\n' + str(t_total) + "secondes")

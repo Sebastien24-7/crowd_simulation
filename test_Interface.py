@@ -6,7 +6,7 @@ from timeit import default_timer
 from tkinter import *
 
 import pyautogui
-import csv
+from csv import writer
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -509,26 +509,25 @@ def deplacement():
         if t_sortie == 0.0:  # Afin de n'avoir qu'une seule fois le temps final et pas de mise à jour
             t_sortie = double_time
 
-            ### Writing of the parameters in Tab
+            refresh()  ## Définit le timeTheory
+            print("Temps Théorique redef")
+
+            ### Writing of the parameters in Excel
             parameters.extend([
-                str(interface.getvar(name="Nbr_particles")), str(interface.getvar(name="Nbr_part_out")),
+                str(len(p)), str(len(part_out)),
                 str(t_sortie), str(timeTheory),
                 str(interface.getvar(name="crowd_type")), str(interface.getvar(name="crowd_setup")),
                 str(coord_obstacle[0]), str(coord_obstacle[1])
             ])
-            with open('test.csv', 'w', newline='\r\n') as f:
-                # for i in range(len(parameters)):
-                #   writer.writerow(parameters[i])
-                writer = csv.writer(f)
-                writer.writerow((parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
-                                 parameters[5], parameters[6], parameters[7], parameters[8]))
+            with open('test.csv', 'a') as f:
+                writer_object = writer(f)
+                writer_object.writerow(parameters)
+                f.close()
 
             ####
 
         print("And all of them get out in " + (str)(str_time) + "seconds and to be more precise :" + str(
             t_sortie) + "seconds")
-
-        refresh()  ## Définit le timeTheory
 
         example.set(
             "Tout le monde est sorti, avec N =" + str(interface.getvar(name="Nbr_particles"))
