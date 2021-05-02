@@ -1,0 +1,8 @@
+Nbr particules,Nbr part_out,Temps d'evac,Temps Théorique,Type Pop,Setup Pop,Obstacle,"Position Obstacle (x,y)"
+11,11,23.201,11.74,Hétérogène,Aléatoire,1,"[500, 250]"
+15,15,13.151,13.23,Homogène,Ordonnée,1,"[500, 250]"
+13,13,28.281,13.23,Homogène,Aléatoire,1,"[500, 250]"
+21,21,29.374,13.17,Hétérogène,Aléatoire,1,"[500, 250]"
+25,25,13.18,13.23,Homogène,Ordonnée,1,"[500, 250]"
+26,26,16.218,11.17,Hétérogène,Ordonnée,1,"[500, 250]"
+15,15,27.307,13.23,Homogène,Aléatoire,1,"[500, 250]"

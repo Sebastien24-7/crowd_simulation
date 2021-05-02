@@ -6,13 +6,15 @@ from timeit import default_timer
 from tkinter import *
 
 import pyautogui
-from csv import writer
+from csv import writer, DictWriter
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+
+from analyse import analyse
 from environment import *
 import numpy as np
 from matplotlib import pyplot as plt
@@ -25,14 +27,16 @@ from theory import theory
 w_porte = 50
 X_obstacle = 500
 w_obstacle = 50
-parameters = [
-    ""]  # Will contains [Nbr particules, Nbr part_out, Temps d'evac, Temps Théorique, Type Pop, Setup Pop, Position Obstacle x puis y]
+# parameters = [""]
+# Will contains [Nbr particules, Nbr part_out, Temps d'evac, Temps Théorique, Type Pop, Setup Pop, Position Obstacle x puis y]
+dict_param = {}
+
 part_out = []
 ListPart = []
 world = Room()  # The aim is to use it for everything linked to the creation of the room etc
 ListObstacles = Room().ListObstacles
 coord_sortie = [0, world.height / 2]
-coord_obstacle = [X_obstacle, world.height / 2]
+coord_obstacle = [X_obstacle, (int)(world.height / 2)]
 Dsortie = 0.0
 start = 0.0
 str_time = ''
@@ -82,6 +86,10 @@ crowd_selec2 = StringVar(Frame2, name="crowd_selec2")
 crowd_selec2.set('Choisissez le type de Population :')
 crowd_type = StringVar(Frame2, name="crowd_type", value="Homogène")  # Value =1 enables to unchecked the radiobutton
 
+Bool_obs = StringVar(Frame2, name="Bool_obs")
+Bool_obs.set("Choississez la présence ou non d'un obstacle :")
+Bool_obstacle = BooleanVar(Frame2, name="Bool_obstacle", value="True")
+
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
 Nbr_part_out = IntVar(interface, name="Nbr_part_out")
 
@@ -125,6 +133,8 @@ def graph():
     else:
         pass
         ## Because in this case we have a pop which is Homogeneous
+
+    # analyse()
 
 
 # Function to display some data
@@ -230,43 +240,51 @@ def refresh():
 
 
 def select():
+    print(Bool_obstacle.get())
     print(crowd_setup.get())
     print(crowd_type.get())
 
 
 ##Creation of RadioButton to select how to study the room evacuation :
+obs_label = Label(Frame2, textvariable=Bool_obs)
+Robs1 = Radiobutton(Frame2, text="Non", variable=Bool_obstacle, value="False", command=select)
+Robs2 = Radiobutton(Frame2, text="Oui", variable=Bool_obstacle, value="True", command=select)
+obs_label.grid(row=4, column=0)
+Robs1.grid(row=4, column=1, padx=(10, 0))
+Robs2.grid(row=4, column=2)
+
 crowdlabel = Label(Frame2, textvariable=crowd_selec)
 Rpos1 = Radiobutton(Frame2, text="Population Ordonnée", variable=crowd_setup, value="Ordonnée", command=select)
 Rpos2 = Radiobutton(Frame2, text="Population Aléatoire", variable=crowd_setup, value="Aléatoire", command=select)
-crowdlabel.grid(row=4, column=0)
-Rpos1.grid(row=4, column=1, padx=(10, 0))
-Rpos2.grid(row=4, column=2)
+crowdlabel.grid(row=5, column=0)
+Rpos1.grid(row=5, column=1, padx=(10, 0))
+Rpos2.grid(row=5, column=2)
 
 crowdlabel2 = Label(Frame2, textvariable=crowd_selec2)
-Rtype1 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
-Rtype2 = Radiobutton(Frame2, text="Population Hétérogène", variable=crowd_type, value="Hétérogène", command=select)
-crowdlabel2.grid(row=5, column=0)
-Rtype1.grid(row=5, column=1, padx=(10, 0))
-Rtype2.grid(row=5, column=2)
+Rtype1 = Radiobutton(Frame2, text="Population Hétérogène", variable=crowd_type, value="Hétérogène", command=select)
+Rtype2 = Radiobutton(Frame2, text="Population Homogène", variable=crowd_type, value="Homogène", command=select)
+crowdlabel2.grid(row=6, column=0)
+Rtype1.grid(row=6, column=1, padx=(10, 0))
+Rtype2.grid(row=6, column=2)
 
 # Creation of a Button "Launch":
 Bouton_Lancer = Button(Frame2, text='Lancer', command=lancer, activebackground="RED")
-Bouton_Lancer.grid(row=6, column=0)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=7, column=0)  # We add the button to the display of interface tk
 
 # Creation of a Button "Evacuate":
 Bouton_Lancer = Button(Frame2, text='Evacuer', command=evacuate, activebackground="RED")
-Bouton_Lancer.grid(row=6, column=1)  # We add the button to the display of interface tk
+Bouton_Lancer.grid(row=7, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
 Bouton_Refresh = Button(Frame2, text='Rafraîchir', command=refresh, activebackground="RED")
-Bouton_Refresh.grid(row=6, column=2)  # We add the button to the display of interface tk
+Bouton_Refresh.grid(row=7, column=2)  # We add the button to the display of interface tk
 
 Bouton_Graph = Button(Frame2, text='Graphique', command=graph, activebackground="RED")
-Bouton_Graph.grid(row=7, column=1)  # We add the button to the display of interface tk
+Bouton_Graph.grid(row=8, column=1)  # We add the button to the display of interface tk
 
 # Creation of a Button "Refresh":
 Bouton_Screen = Button(Frame2, text='Screenshot', command=screenShoot, activebackground="RED")
-Bouton_Screen.grid(row=7, column=0)  # We add the button to the display of interface tk
+Bouton_Screen.grid(row=8, column=0)  # We add the button to the display of interface tk
 
 
 ###########
@@ -513,15 +531,29 @@ def deplacement():
             print("Temps Théorique redef")
 
             ### Writing of the parameters in Excel
-            parameters.extend([
-                str(len(p)), str(len(part_out)),
-                str(t_sortie), str(timeTheory),
-                str(interface.getvar(name="crowd_type")), str(interface.getvar(name="crowd_setup")),
-                str(coord_obstacle[0]), str(coord_obstacle[1])
-            ])
-            with open('test.csv', 'a') as f:
-                writer_object = writer(f)
-                writer_object.writerow(parameters)
+            # parameters.extend([
+            #     str(len(p)), str(len(part_out)),
+            #     str(t_sortie), str(timeTheory),
+            #     str(interface.getvar(name="crowd_type")), str(interface.getvar(name="crowd_setup")),
+            #     str(coord_obstacle[0]), str(coord_obstacle[1])
+            # ])
+            field_names = ['Nbr particules', 'Nbr part_out', "Temps d'evac", 'Temps Théorique', 'Type Pop', 'Setup Pop',
+                           'Obstacle', 'Position Obstacle (x,y)']
+            dict_param = {'Nbr particules': len(p), 'Nbr part_out': len(part_out), "Temps d'evac": str(t_sortie),
+                          'Temps Théorique': str(timeTheory), 'Type Pop': str(interface.getvar(name="crowd_type")),
+                          'Setup Pop': str(interface.getvar(name="crowd_setup")),
+                          'Obstacle': str(interface.getvar(name="Bool_obstacle")),
+                          'Position Obstacle (x,y)': coord_obstacle}
+
+            with open('crowd_data.csv', 'a') as f:
+                # writer_object = writer(f)
+                # writer_object.writerow(dict)
+
+                # You will get a object of DictWriter
+                dictwriter_object = DictWriter(f, fieldnames=field_names)
+                # Pass the dictionary as an argument to the Writerow()
+                dictwriter_object.writerow(dict_param)
+
                 f.close()
 
             ####
