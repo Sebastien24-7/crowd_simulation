@@ -88,7 +88,7 @@ crowd_type = StringVar(Frame2, name="crowd_type", value="Homogène")  # Value =1
 
 Bool_obs = StringVar(Frame2, name="Bool_obs")
 Bool_obs.set("Choississez la présence ou non d'un obstacle :")
-Bool_obstacle = BooleanVar(Frame2, name="Bool_obstacle", value="True")
+Bool_obstacle = StringVar(Frame2, name="Bool_obstacle", value="Oui")
 
 Nbr_particles = IntVar(interface, name="Nbr_particles")  # Variable who will contain the input Number
 Nbr_part_out = IntVar(interface, name="Nbr_part_out")
@@ -134,7 +134,7 @@ def graph():
         pass
         ## Because in this case we have a pop which is Homogeneous
 
-    # analyse()
+    analyse()
 
 
 # Function to display some data
@@ -247,8 +247,8 @@ def select():
 
 ##Creation of RadioButton to select how to study the room evacuation :
 obs_label = Label(Frame2, textvariable=Bool_obs)
-Robs1 = Radiobutton(Frame2, text="Non", variable=Bool_obstacle, value="False", command=select)
-Robs2 = Radiobutton(Frame2, text="Oui", variable=Bool_obstacle, value="True", command=select)
+Robs1 = Radiobutton(Frame2, text="Non", variable=Bool_obstacle, value="Non", command=select)
+Robs2 = Radiobutton(Frame2, text="Oui", variable=Bool_obstacle, value="Oui", command=select)
 obs_label.grid(row=4, column=0)
 Robs1.grid(row=4, column=1, padx=(10, 0))
 Robs2.grid(row=4, column=2)
